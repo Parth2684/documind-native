@@ -41,6 +41,11 @@ pub fn unlock_vault(password: String, app: AppHandle) -> Result<(), String> {
                 eprintln!("{}", error);
                 error
             })?;
+        stronghold.create_client(b"documind")
+            .map_err(|err| {
+                eprintln!("error creating stronghold client: {}", err);
+                String::from("Error creating stronghold client")
+            })?;
     }
     let mut hold = state
         .stronghold

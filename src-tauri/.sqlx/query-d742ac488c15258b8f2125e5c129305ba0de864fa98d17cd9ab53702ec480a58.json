@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                INSERT INTO gemini_keys (hash, name)\n                VALUES ($1, $2)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "d742ac488c15258b8f2125e5c129305ba0de864fa98d17cd9ab53702ec480a58"
+}

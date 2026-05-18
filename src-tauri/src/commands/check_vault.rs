@@ -9,10 +9,10 @@ use crate::AppState;
 pub async fn check_vault(app: AppHandle) -> Result<bool, String> {
     let state = app.state::<AppState>();
     let db = state.db.clone();
-    let exists = sqlx::query!(r"
+    let exists = sqlx::query!(r#"
             SELECT * FROM vault
             WHERE id = 1
-        ")
+        "#)
     .fetch_one(&db)
     .await
     .map_err(|err| {
