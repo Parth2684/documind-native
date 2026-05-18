@@ -5,6 +5,9 @@ description = "A Tauri App"
 authors = ["you"]
 edition = "2021"
 
+
+[profile.dev.package.scrypt]
+opt-level = 3
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
@@ -27,3 +30,6 @@ sqlx = { version = "0.8.6", features = ["macros", "migrate", "runtime-tokio", "s
 tokio = { version = "1.52.3", features = ["full"] }
 dirs = "6.0.0"
 tauri-plugin-stronghold = "2"
+iota_stronghold = "2.1.0"
+crypto = "0.5.1"
+zeroize = "1.8.2"

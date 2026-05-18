@@ -1,30 +1,26 @@
-use std::fs;
+use std::{fs, path::PathBuf, sync::Mutex};
 
+use iota_stronghold::Stronghold;
 use ort::{
     ep::{CoreML, DirectML, ROCm, CPU, CUDA, NNAPI, XNNPACK},
     session::Session,
 };
 use sqlx::{
-    migrate::{MigrateDatabase, Migrator},
-    sqlite::{SqliteConnectOptions, SqlitePoolOptions},
-    Sqlite,
+    Pool, Sqlite, migrate::{Migrator}, sqlite::{SqliteConnectOptions, SqlitePoolOptions}
 };
 use tauri::Manager;
 
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
+mod commands;
+
+use commands::{check_vault::check_vault, unlock_vault::unlock_vault};
 
 struct AppState {
     tts_session: Session,
+    db: Pool<Sqlite>,
+    local_data_dir: PathBuf,
+    stronghold: Mutex<Option<Stronghold>>
 }
 
-struct Migration {
-    version: u8,
-    sql: &'static str,
-}
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub async fn run() {
@@ -53,7 +49,6 @@ pub async fn run() {
     MIGRATOR.run(&pool).await.expect("Error Migrating Database");
 
     tauri::Builder::default()
-        .plugin(tauri_plugin_stronghold::Builder::new(|pass| todo!()).build())
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             let local_data_dir = app
@@ -93,10 +88,16 @@ pub async fn run() {
                 .commit_from_file(tts_model_path)
                 .expect("Error loading TTS Model from model path");
 
-            app.manage(AppState { tts_session });
+
+            app.manage(AppState { 
+                tts_session,
+                db: pool,
+                local_data_dir,
+                stronghold: Mutex::new(None)
+            });
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![greet])
+        .invoke_handler(tauri::generate_handler![check_vault, unlock_vault])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
