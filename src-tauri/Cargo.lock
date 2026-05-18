@@ -1142,6 +1142,7 @@ dependencies = [
  "chrono",
  "crypto",
  "dirs 6.0.0",
+ "infer",
  "iota_stronghold",
  "ort",
  "serde",

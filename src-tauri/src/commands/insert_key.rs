@@ -1,5 +1,4 @@
 use blake3::hash;
-use chrono::Local;
 use iota_stronghold::{Location, SnapshotPath, procedures::WriteVault};
 use tauri::{AppHandle, Manager};
 use zeroize::Zeroizing;
@@ -55,12 +54,9 @@ pub async fn insert_keys(app: AppHandle, name: String, key: String) -> Result<()
                         String::from("Error getting stronghold client")
                     })?;
     
-                let location = Location::generic("gemini_keys", name);
+                // let location = Location::generic("gemini_keys", hash.clone());
     
-                client.execute_procedure(WriteVault {
-                    data: Zeroizing::new(key.as_bytes().to_vec()),
-                    location
-                })
+                client.store().insert(hash.as_bytes().to_vec(), key.as_bytes().to_vec(), None)
                 .map_err(|err| {
                     eprintln!("Error storing data in vault: {}", err);
                     String::from("Error Storing data in vault")
@@ -83,6 +79,7 @@ pub async fn insert_keys(app: AppHandle, name: String, key: String) -> Result<()
                 eprintln!("{}: {}", stmt, err);
                 stmt
             })?;
+            Ok(())
         }
         (Ok(Some(_)), Ok(None)) => {
             return Err(String::from("gemini key exists with different name"))
@@ -97,5 +94,4 @@ pub async fn insert_keys(app: AppHandle, name: String, key: String) -> Result<()
             return Err(String::from("Error connecting with db"))
         }
     }
-    Ok(())
 }
