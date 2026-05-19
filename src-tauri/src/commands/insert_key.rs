@@ -1,7 +1,6 @@
 use blake3::hash;
-use iota_stronghold::{Location, SnapshotPath, procedures::WriteVault};
+use iota_stronghold::{ SnapshotPath};
 use tauri::{AppHandle, Manager};
-use zeroize::Zeroizing;
 
 use crate::AppState;
 

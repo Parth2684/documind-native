@@ -1,12 +1,42 @@
 use iota_stronghold::Location;
 use tauri::{AppHandle, Manager};
-
+use serde::{Deserialize, Serialize};
 use crate::AppState;
 
+#[derive(Deserialize)]
+pub enum Category {
+    Base,
+    Notes,
+    Story,
+    Music,
+    Comic,
+    Coding,
+    Presentation
+}
+
+#[derive(Serialize)]
+struct Message {
+    text: String
+}
+#[derive(Serialize)]
+struct SystemInstruction {
+    parts: [Message; 1]
+}
+
+#[derive(Serialize)]
+struct Content {
+    role: String,
+    parts: [Message; 1]
+}
 
 
+#[derive(Serialize)]
+struct Prompt {
+    system_instruction: SystemInstruction,
+    contents: Content
+}
 
-pub async fn ocr(app: AppHandle, hash: String, file_path: String) -> Result<String, String> {
+pub async fn ocr(app: AppHandle, hash: String, file_path: Vec<String>, category: Category) -> Result<String, String> {
     let state = app.state::<AppState>();
     let stronghold_lock = state.stronghold.lock().map_err(|err| {
         let stmt = String::from("Error getting Stringhold");
@@ -52,6 +82,7 @@ pub async fn ocr(app: AppHandle, hash: String, file_path: String) -> Result<Stri
                             eprintln!("{}: {}", stmt, err);
                            stmt
                         })?;
+                    
                 }
             }
         }
