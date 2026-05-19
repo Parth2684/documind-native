@@ -1,9 +1,9 @@
 use std::path::PathBuf;
 
-use infer::{Infer, MatcherType};
+use infer::{MatcherType};
 
 
-enum FileType {
+pub enum FileType {
     Image,
     PDF
 }

@@ -18,7 +18,8 @@ struct AppState {
     tts_session: Session,
     db: Pool<Sqlite>,
     local_data_dir: PathBuf,
-    stronghold: Mutex<Option<Stronghold>>
+    stronghold: Mutex<Option<Stronghold>>,
+    pdf_images_dir: PathBuf
 }
 
 
@@ -59,6 +60,11 @@ pub async fn run() {
                 fs::create_dir_all(&local_data_dir).expect("Error Creating App Local Data Folder");
             }
 
+            let pdf_images_dir = app.path().app_cache_dir().expect("Cache dir is not accessible").join("pdfs");
+            if !pdf_images_dir.exists() {
+                fs::create_dir_all(&pdf_images_dir).expect("Error creating cache dir");
+            }
+            
             let resources_dir = app
                 .path()
                 .resource_dir()
@@ -93,7 +99,8 @@ pub async fn run() {
                 tts_session,
                 db: pool,
                 local_data_dir,
-                stronghold: Mutex::new(None)
+                stronghold: Mutex::new(None),
+                pdf_images_dir
             });
             Ok(())
         })
