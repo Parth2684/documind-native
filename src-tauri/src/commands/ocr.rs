@@ -104,18 +104,23 @@ pub async fn ocr(app: AppHandle, hash: String, file_paths: HashMap<u8, String>, 
                                     Ok(file_type) => {
                                         match file_type {
                                             FileType::Image =>{
-                                                let image = match image::open(path) {
+                                                match image::open(&path) {
                                                     Err(err) => {
                                                         eprintln!("Error opening image: {}", err);
                                                         return;
                                                     }
                                                     Ok(img) => {
-                                                        let webp_path = match img.save_with_format(path, image::ImageFormat::WebP) {
+                                                        let name = match path.file_name() {
+                                                            None => Uuid::new_v4().to_string(),
+                                                            Some(name) => name.to_string_lossy().to_string()
+                                                        };
+                                                        let webp_path = &state.pdf_images_dir.join(name);
+                                                        match img.save_with_format(&webp_path, image::ImageFormat::WebP) {
                                                             Err(err) => {
                                                                 eprintln!("Error saving image in webp: {}", err);
                                                                 return;
                                                             }
-                                                            Ok(_) => webp_queue.push_back(path),
+                                                            Ok(_) => webp_queue.push_back(webp_path.to_owned()),
                                                         };
                                                     }
                                                 };
@@ -130,7 +135,6 @@ pub async fn ocr(app: AppHandle, hash: String, file_paths: HashMap<u8, String>, 
                                                     Ok(pdf) => pdf
                                                 };
                                                 
-                                                let number_of_pages = pdf.page_count();
                                                 let pdf_name = match path.file_name() {
                                                   Some(name)   => name.to_string_lossy().to_string(),
                                                   None => Uuid::new_v4().to_string()
@@ -139,7 +143,7 @@ pub async fn ocr(app: AppHandle, hash: String, file_paths: HashMap<u8, String>, 
                                                 let pages = match pdf.render(pdf2image::Pages::Range(0..=pdf.page_count()), RenderOptionsBuilder::default().build().expect("Error getting default renfer options")) {
                                                     Err(err) => {
                                                         eprintln!("Error getting images from the pdf: {}", err);
-                                                        app.emit("pdf_error", format!("Error parsing images from pdf: {}", pdf.1.to_owned())).ok();
+                                                        app.emit("pdf_error", format!("Error parsing images from pdf: {}", err.to_string())).ok();
                                                         return;
                                                     }
                                                     Ok(pages) => pages
