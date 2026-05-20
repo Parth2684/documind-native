@@ -1,10 +1,11 @@
-use std::{collections::HashMap, path::PathBuf, str::FromStr};
+use std::{collections::{HashMap, VecDeque}, fs::{self}, path::PathBuf, str::FromStr};
 
 use iota_stronghold::Location;
-use pdf2image::{PDF, RenderOptionsBuilder};
+use pdf2image::{PDF, RenderOptionsBuilder, image};
 use tauri::{AppHandle, Emitter, Manager};
 use serde::{Deserialize, Serialize};
-use crate::{AppState, commands::helpers::file_type::{FileType, get_file_type}};
+use uuid::Uuid;
+use crate::{AppState, commands::helpers::file_type::{self, FileType, get_file_type}};
 
 #[derive(Deserialize)]
 pub enum Category {
@@ -86,8 +87,7 @@ pub async fn ocr(app: AppHandle, hash: String, file_paths: HashMap<u8, String>, 
                            stmt
                         })?;
 
-                    let mut images: HashMap<u8, PathBuf> = HashMap::new();
-                    let mut pdfs: HashMap<u8, PathBuf> =  HashMap::new();
+                    let mut webp_queue: VecDeque<PathBuf> = VecDeque::new();
                     file_paths.iter().for_each(|file_path| {
                         let path = PathBuf::from_str(file_path.1);
                         match path {
@@ -103,8 +103,66 @@ pub async fn ocr(app: AppHandle, hash: String, file_paths: HashMap<u8, String>, 
                                     }
                                     Ok(file_type) => {
                                         match file_type {
-                                            FileType::Image => images.insert(file_path.0.to_owned(), path.to_owned()),
-                                            FileType::PDF => pdfs.insert(file_path.0.to_owned(), path.to_owned()),
+                                            FileType::Image =>{
+                                                let image = match image::open(path) {
+                                                    Err(err) => {
+                                                        eprintln!("Error opening image: {}", err);
+                                                        return;
+                                                    }
+                                                    Ok(img) => {
+                                                        let webp_path = match img.save_with_format(path, image::ImageFormat::WebP) {
+                                                            Err(err) => {
+                                                                eprintln!("Error saving image in webp: {}", err);
+                                                                return;
+                                                            }
+                                                            Ok(_) => webp_queue.push_back(path),
+                                                        };
+                                                    }
+                                                };
+                                            } ,
+                                            FileType::PDF => {
+                                                let pdf = match PDF::from_file(&path) {
+                                                    Err(err) => {
+                                                        eprintln!("error getting pdf from file: {}", err);
+                                                        app.emit("error_getting_pdf", format!("Error getting pdf from: {:?}", file_path.1.to_owned())).ok();
+                                                        return;
+                                                    }
+                                                    Ok(pdf) => pdf
+                                                };
+                                                
+                                                let number_of_pages = pdf.page_count();
+                                                let pdf_name = match path.file_name() {
+                                                  Some(name)   => name.to_string_lossy().to_string(),
+                                                  None => Uuid::new_v4().to_string()
+                                                };
+                                                
+                                                let pages = match pdf.render(pdf2image::Pages::Range(0..=pdf.page_count()), RenderOptionsBuilder::default().build().expect("Error getting default renfer options")) {
+                                                    Err(err) => {
+                                                        eprintln!("Error getting images from the pdf: {}", err);
+                                                        app.emit("pdf_error", format!("Error parsing images from pdf: {}", pdf.1.to_owned())).ok();
+                                                        return;
+                                                    }
+                                                    Ok(pages) => pages
+                                                };
+                    
+                                                let pdf_dir = &state.pdf_images_dir.join(pdf_name);
+                                                fs::create_dir_all(pdf_dir).ok();
+                                                for page in pages {
+                                                    let file_name = match &path.file_name() {
+                                                        None => Uuid::new_v4().to_string(),
+                                                        Some(name) => name.to_string_lossy().to_string()
+                                                    };
+                                                    let img_dir = pdf_dir.join(file_name); 
+                                                    match page.save_with_format(&img_dir, pdf2image::image::ImageFormat::WebP) {
+                                                        Err(err) => {
+                                                            eprintln!("Error saving image: {}", err);
+                                                            continue;
+                                                        }
+                                                        Ok(_) => webp_queue.push_back(img_dir),
+                                                    };
+                                                }
+
+                                            },
                                         };
                                     }
                                 }
@@ -112,33 +170,7 @@ pub async fn ocr(app: AppHandle, hash: String, file_paths: HashMap<u8, String>, 
                         }
                     });
                     
-                    if !pdfs.is_empty() {
-                        pdfs.iter().for_each(|pdf| {
-                            let pdf = match PDF::from_file(pdf.1) {
-                                Err(err) => {
-                                    eprintln!("error getting pdf from file: {}", err);
-                                    app.emit("error_getting_pdf", format!("Error getting pdf from: {:?}", pdf.1.to_owned())).ok();
-                                    return;
-                                }
-                                Ok(pdf) => pdf
-                            };
-
-                            let number_of_pages = pdf.page_count();
-                            let pages = match pdf.render(pdf2image::Pages::Range(0..=pdf.page_count()), RenderOptionsBuilder::default().build().expect("Error getting default renfer options")) {
-                                Err(err) => {
-                                    eprintln!("Error getting images from the pdf: {}", err);
-                                    app.emit("pdf_error", format!("Error parsing images from pdf: {}", pdf.1.to_owned())).ok();
-                                    return;
-                                }
-                                Ok(pages) => pages
-                            };
-
-                            for page in pages {
-                                
-                            }
-                            
-                        });
-                    }
+                    
                     
                     Ok("".into())
 

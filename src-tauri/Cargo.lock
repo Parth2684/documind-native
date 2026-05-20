@@ -1355,6 +1355,7 @@ dependencies = [
  "tauri-plugin-opener",
  "tauri-plugin-stronghold",
  "tokio",
+ "uuid",
  "zeroize",
 ]
 
