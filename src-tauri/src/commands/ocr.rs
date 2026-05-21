@@ -47,6 +47,27 @@ struct Prompt {
     input: Vec<Input>
 }
 
+
+#[derive(Deserialize)]
+struct Text {
+    text: String
+}
+
+#[derive(Deserialize)]
+struct Content {
+    parts: [Text; 1]
+}
+
+#[derive(Deserialize)]
+struct Candidate {
+    content: Content
+}
+
+#[derive(Deserialize)]
+struct GeminiResponse {
+    candidates: [Candidate; 1]
+}
+
 #[tauri::command]
 pub async fn ocr(app: AppHandle, hash: String, file_paths: HashMap<u8, String>, category: Category, model: Model) -> Result<String, String> {
     
@@ -185,6 +206,7 @@ pub async fn ocr(app: AppHandle, hash: String, file_paths: HashMap<u8, String>, 
         }
     });
 
+    let mut ocr_text = String::from("");
     let system_instructions = get_prompt_config(category);
 
     'requester: loop {
@@ -228,15 +250,45 @@ pub async fn ocr(app: AppHandle, hash: String, file_paths: HashMap<u8, String>, 
                 })
                 .send()
                 .await;
-                
-            
+
+            match res {
+                Err(err) => {
+                    let stmt = format!("Error getting response from gemini: {}", err);
+                    eprintln!("{}", &stmt);
+                    app.emit("error", stmt).ok();
+                    continue;
+                }
+                Ok(response) => {
+                    match response.json::<GeminiResponse>().await {
+                        Ok(data) => {
+                            ocr_text.push_str(&data.candidates[0].content.parts[0].text);
+                        }
+                        Err(err) => {
+                            eprintln!("Error from Gemini: {}", err);
+                            app.emit("error_ocr", format!("err from gemini: {}", err)).ok();
+                        }
+                    }
+                }
+            }
             
             if webp_queue.is_empty() {
                 break 'requester
             }
         
     };
+    let id = Uuid::new_v4().to_string();
+    let db = state.db.clone();
+    let ocr_clone = ocr_text.clone();
+    sqlx::query!(r#"
+        INSERT INTO ocr_text (id, text)
+        VALUES ($1, $2)
+    "#,
+    id,
+    ocr_clone
+    )
+    .execute(&db)
+    .await.ok();
 
-    Ok("".into())
+    Ok(ocr_text)
 }
             
