@@ -124,13 +124,13 @@ pub async fn ocr(app: AppHandle, hash: String, file_paths: HashMap<u8, String>, 
         match path {
             Err(err) => {
                 eprintln!("Error getting file: {}", err);
-                app.emit("error_file_not_found", file_path.to_owned()).ok();
+                app.emit("error_ocr", format!("file not accessible: {}", file_path.1)).ok();
             }
             Ok(path) => {
                 match get_file_type(&path) {
                     Err(err) => {
                         eprintln!("Error getting file type: {}", err);
-                        app.emit("error_file_type", path.to_owned()).ok();
+                        app.emit("error_ocr", format!("error gettong file typr: {:?}", path.to_owned())).ok();
                     }
                     Ok(file_type) => {
                         match file_type {
@@ -149,7 +149,7 @@ pub async fn ocr(app: AppHandle, hash: String, file_paths: HashMap<u8, String>, 
                                         match img.save_with_format(&webp_path, image::ImageFormat::WebP) {
                                             Err(err) => {
                                                 eprintln!("Error saving image in webp: {}", err);
-                                                app.emit("error_saving_image", format!("Error getting pdf from: {:?}", file_path.1.to_owned())).ok();
+                                                app.emit("error_ocr", format!("Error getting pdf from: {:?}", file_path.1.to_owned())).ok();
                                                 return;
                                             }
                                             Ok(_) => webp_queue.push_back(webp_path.to_owned()),
@@ -161,7 +161,7 @@ pub async fn ocr(app: AppHandle, hash: String, file_paths: HashMap<u8, String>, 
                                 let pdf = match PDF::from_file(&path) {
                                     Err(err) => {
                                         eprintln!("error getting pdf from file: {}", err);
-                                        app.emit("error_getting_pdf", format!("Error getting pdf from: {:?}", file_path.1.to_owned())).ok();
+                                        app.emit("error_ocr", format!("Error getting pdf from: {:?}", file_path.1.to_owned())).ok();
                                         return;
                                     }
                                     Ok(pdf) => pdf
@@ -175,7 +175,7 @@ pub async fn ocr(app: AppHandle, hash: String, file_paths: HashMap<u8, String>, 
                                 let pages = match pdf.render(pdf2image::Pages::Range(0..=pdf.page_count()), RenderOptionsBuilder::default().build().expect("Error getting default renfer options")) {
                                     Err(err) => {
                                         eprintln!("Error getting images from the pdf: {}", err);
-                                        app.emit("pdf_error", format!("Error parsing images from pdf: {}", err.to_string())).ok();
+                                        app.emit("error_ocr", format!("Error parsing images from pdf: {}", err.to_string())).ok();
                                         return;
                                     }
                                     Ok(pages) => pages
@@ -208,6 +208,10 @@ pub async fn ocr(app: AppHandle, hash: String, file_paths: HashMap<u8, String>, 
 
     let mut ocr_text = String::from("");
     let system_instructions = get_prompt_config(category);
+
+    if webp_queue.is_empty() {
+        return Err(String::from("Nothing Found for ocr"));
+    }
 
     'requester: loop {
         let input_vec: Vec<Input> = (0..5)
@@ -255,7 +259,7 @@ pub async fn ocr(app: AppHandle, hash: String, file_paths: HashMap<u8, String>, 
                 Err(err) => {
                     let stmt = format!("Error getting response from gemini: {}", err);
                     eprintln!("{}", &stmt);
-                    app.emit("error", stmt).ok();
+                    app.emit("error_ocr", stmt).ok();
                     continue;
                 }
                 Ok(response) => {
@@ -276,6 +280,11 @@ pub async fn ocr(app: AppHandle, hash: String, file_paths: HashMap<u8, String>, 
             }
         
     };
+
+    if ocr_text.trim().is_empty() {
+        return Err(String::from("Error OCR Found Empty"));
+    }
+    
     let id = Uuid::new_v4().to_string();
     let db = state.db.clone();
     let ocr_clone = ocr_text.clone();
