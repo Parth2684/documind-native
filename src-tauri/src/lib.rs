@@ -12,7 +12,7 @@ use tauri::Manager;
 
 mod commands;
 
-use commands::{check_vault::check_vault, unlock_vault::unlock_vault, insert_key::insert_keys};
+use commands::{check_vault::check_vault, unlock_vault::unlock_vault, insert_key::insert_keys, ocr::ocr};
 
 struct AppState {
     tts_session: Session,
@@ -104,7 +104,7 @@ pub async fn run() {
             });
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![check_vault, unlock_vault, insert_keys])
+        .invoke_handler(tauri::generate_handler![check_vault, unlock_vault, insert_keys, ocr])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
