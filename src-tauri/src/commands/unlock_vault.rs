@@ -7,7 +7,7 @@ use crate::AppState;
 
 
 #[tauri::command]
-pub fn unlock_vault(password: String, app: AppHandle) -> Result<(), String> {
+pub async fn unlock_vault(password: String, app: AppHandle) -> Result<(), String> {
     let state = app.state::<AppState>();
     let local_data_dir = state.local_data_dir.clone();
 
@@ -34,6 +34,27 @@ pub fn unlock_vault(password: String, app: AppHandle) -> Result<(), String> {
                 error
             })?;
     }else {
+        
+        let db = state.db.clone();
+        let mut tx = db.begin().await.map_err(|_| {
+            String::from("Error getting transaction from db")
+        })?;
+
+        sqlx::query!(r#"
+            INSERT INTO vault (id, present)
+            VALUES (1, 1)
+        "#)
+        .execute(&mut *tx)
+        .await.map_err(|err| {
+            let stmt = String::from("Error adding vault presense to db");
+            eprintln!("{}: {}", stmt, err);
+            stmt
+        })?;
+        stronghold.create_client(b"documind")
+            .map_err(|err| {
+                eprintln!("error creating stronghold client: {}", err);
+                String::from("Error creating stronghold client")
+            })?;
         stronghold
             .commit_with_keyprovider(&snapshot, &key_provider)
             .map_err(|err| {
@@ -41,11 +62,12 @@ pub fn unlock_vault(password: String, app: AppHandle) -> Result<(), String> {
                 eprintln!("{}", error);
                 error
             })?;
-        stronghold.create_client(b"documind")
-            .map_err(|err| {
-                eprintln!("error creating stronghold client: {}", err);
-                String::from("Error creating stronghold client")
-            })?;
+
+        tx.commit().await.map_err(|err| {
+            let stmt = String::from("Error commiting vault to db");
+            eprintln!("{}: {}", stmt, err);
+            stmt
+        })?;
     }
     let mut hold = state
         .stronghold
