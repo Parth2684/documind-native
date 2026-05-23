@@ -1,10 +1,7 @@
 use std::{fs, path::PathBuf, sync::Mutex};
 
 use iota_stronghold::Stronghold;
-use ort::{
-    ep::{CoreML, DirectML, ROCm, CPU, CUDA, NNAPI, XNNPACK},
-    session::Session,
-};
+
 use sqlx::{
     Pool, Sqlite, migrate::{Migrator}, sqlite::{SqliteConnectOptions, SqlitePoolOptions}
 };
@@ -12,14 +9,14 @@ use tauri::Manager;
 
 mod commands;
 
-use commands::{check_vault::check_vault, unlock_vault::unlock_vault, insert_key::insert_keys, ocr::ocr};
+use commands::{check_vault::check_vault, unlock_vault::unlock_vault, insert_key::insert_keys, ocr::ocr, tts::tts};
 
 struct AppState {
-    tts_session: Session,
     db: Pool<Sqlite>,
     local_data_dir: PathBuf,
     stronghold: Mutex<Option<Stronghold>>,
-    pdf_images_dir: PathBuf
+    pdf_images_dir: PathBuf,
+    tts_dir: PathBuf
 }
 
 
@@ -64,47 +61,39 @@ pub async fn run() {
             if !pdf_images_dir.exists() {
                 fs::create_dir_all(&pdf_images_dir).expect("Error creating cache dir");
             }
+
+            let tts_dir = match app.path().audio_dir() {
+                Err(err) => {
+                    eprintln!("Error acessing audio dir: {}", err);
+                    panic!("Erorr acessing audio dir");
+                }
+                Ok(dir) => {
+                    let tts_dir = dir.join("Documind");
+                    if !tts_dir.exists() {
+                        match fs::create_dir_all(&dir) {
+                            Err(err) => {
+                                eprintln!("Error creating audio dir: {}", err);
+                                panic!("Error creating audio dir")
+                            }
+                            Ok(_) => dir
+                        }
+                    }else {
+                        tts_dir
+                    }
+                }
+            };
             
-            let resources_dir = app
-                .path()
-                .resource_dir()
-                .expect("Error Parsinf Resources Directory");
-            if !resources_dir.exists() {
-                panic!("Resource Directory was not found. Please re-install the application")
-            }
-            let tts_model_path = resources_dir
-                .join("models")
-                .join("kokoro-v1.0.fp16-gpu.onnx");
-            if !tts_model_path.exists() {
-                panic!("TTS Model Does Not Exists, Please re-install the application");
-            }
-
-            let tts_session = Session::builder()
-                .expect("error building session")
-                .with_execution_providers([
-                    CUDA::default().build(),
-                    ROCm::default().build(),
-                    DirectML::default().build(),
-                    NNAPI::default().with_disable_cpu(true).build(),
-                    XNNPACK::default().build(),
-                    CoreML::default().build(),
-                    CPU::default().build(),
-                ])
-                .expect("Error getting execution providers")
-                .commit_from_file(tts_model_path)
-                .expect("Error loading TTS Model from model path");
-
-
+            
             app.manage(AppState { 
-                tts_session,
                 db: pool,
                 local_data_dir,
                 stronghold: Mutex::new(None),
-                pdf_images_dir
+                pdf_images_dir,
+                tts_dir
             });
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![check_vault, unlock_vault, insert_keys, ocr])
+        .invoke_handler(tauri::generate_handler![check_vault, unlock_vault, insert_keys, ocr, tts])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
