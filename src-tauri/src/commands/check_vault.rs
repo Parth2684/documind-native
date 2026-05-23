@@ -13,7 +13,7 @@ pub async fn check_vault(app: AppHandle) -> Result<bool, String> {
             SELECT * FROM vault
             WHERE id = 1
         "#)
-    .fetch_one(&db)
+    .fetch_optional(&db)
     .await
     .map_err(|err| {
         let stmt = String::from("error receiveing response from database if the vault exists");
@@ -21,9 +21,14 @@ pub async fn check_vault(app: AppHandle) -> Result<bool, String> {
         stmt
     })?;
 
-    if exists.present == true {
-        Ok(true)
-    }else {
-        Ok(false)
+    match exists {
+        None => Ok(false),
+        Some(exist) => {
+            if exist.present {
+                Ok(true)
+            }else {
+                Ok(false)
+            }
+        }
     }
 }

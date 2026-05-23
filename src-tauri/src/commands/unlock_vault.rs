@@ -1,4 +1,5 @@
 use iota_stronghold::{KeyProvider, SnapshotPath, Stronghold};
+use sha2::Digest;
 use tauri::{AppHandle, Manager};
 use zeroize::Zeroizing;
 
@@ -14,9 +15,9 @@ pub async fn unlock_vault(password: String, app: AppHandle) -> Result<(), String
     let vault_path = local_data_dir.join("vault.hold");
 
     let stronghold = Stronghold::default();
-
+    let password = sha2::Sha256::digest(password.as_bytes());
     let key_provider = KeyProvider::try_from(
-            Zeroizing::new(password.as_bytes().to_vec())
+            Zeroizing::new(password.to_vec())
     ).map_err(|err| {
         let stmt = String::from("Error converting password to key provider");
         eprintln!("{}: {}", stmt, err);
@@ -36,20 +37,7 @@ pub async fn unlock_vault(password: String, app: AppHandle) -> Result<(), String
     }else {
         
         let db = state.db.clone();
-        let mut tx = db.begin().await.map_err(|_| {
-            String::from("Error getting transaction from db")
-        })?;
 
-        sqlx::query!(r#"
-            INSERT INTO vault (id, present)
-            VALUES (1, 1)
-        "#)
-        .execute(&mut *tx)
-        .await.map_err(|err| {
-            let stmt = String::from("Error adding vault presense to db");
-            eprintln!("{}: {}", stmt, err);
-            stmt
-        })?;
         stronghold.create_client(b"documind")
             .map_err(|err| {
                 eprintln!("error creating stronghold client: {}", err);
@@ -63,8 +51,14 @@ pub async fn unlock_vault(password: String, app: AppHandle) -> Result<(), String
                 error
             })?;
 
-        tx.commit().await.map_err(|err| {
-            let stmt = String::from("Error commiting vault to db");
+        
+        sqlx::query!(r#"
+            INSERT INTO vault (id, present)
+            VALUES (1, 1)
+        "#)
+        .execute(&db)
+        .await.map_err(|err| {
+            let stmt = String::from("Error adding vault presense to db");
             eprintln!("{}: {}", stmt, err);
             stmt
         })?;

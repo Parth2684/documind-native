@@ -70,12 +70,12 @@ pub async fn run() {
                 Ok(dir) => {
                     let tts_dir = dir.join("Documind");
                     if !tts_dir.exists() {
-                        match fs::create_dir_all(&dir) {
+                        match fs::create_dir_all(&tts_dir) {
                             Err(err) => {
                                 eprintln!("Error creating audio dir: {}", err);
                                 panic!("Error creating audio dir")
                             }
-                            Ok(_) => dir
+                            Ok(_) => tts_dir
                         }
                     }else {
                         tts_dir
