@@ -7,7 +7,8 @@
     "beforeDevCommand": "bun run dev",
     "devUrl": "http://localhost:1420",
     "beforeBuildCommand": "bun run build",
-    "frontendDist": "../dist"
+    "frontendDist": "../dist",
+    "removeUnusedCommands": true
   },
   "app": {
     "windows": [
@@ -22,11 +23,21 @@
     }
   },
   "bundle": {
-    "resources": [
-      "models/*"
-    ],
+    "linux":{
+      "deb": {
+        "files": {},
+        "depends": ["espeak-ng"]
+      },
+      "rpm": {
+        "epoch": 0,
+        "files": {},
+        "release": "1",
+        "depends": ["espeak-ng"]
+      }
+    },
+    "resources": ["models/*"],
     "active": true,
-    "targets": "all",
+    "targets": ["deb", "rpm"],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

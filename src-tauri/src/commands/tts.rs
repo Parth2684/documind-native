@@ -1,7 +1,7 @@
-use std::path::PathBuf;
+use std::{time::Instant};
 
 use tauri::{AppHandle, Manager};
-use tts_rs::{SynthesisEngine, engines::kokoro::{KokoroEngine, KokoroInferenceParams, KokoroModelParams}};
+use tts_rs::{SynthesisEngine, engines::kokoro::{KokoroEngine, KokoroInferenceParams}};
 use uuid::Uuid;
 
 use crate::AppState;
@@ -9,7 +9,8 @@ use crate::AppState;
 
 
 #[tauri::command]
-pub async fn tts(app: AppHandle, text: String, voice: String, speed: f32) -> Result<PathBuf, String> {
+pub async fn tts(app: AppHandle, text: String, voice: String, speed: f32, text_id: Option<String>) -> Result<String, String> {
+    let start = Instant::now();
     let resources_dir = app
         .path()
         .resource_dir()
@@ -31,7 +32,7 @@ pub async fn tts(app: AppHandle, text: String, voice: String, speed: f32) -> Res
     }
 
     let state = app.state::<AppState>();
-    let (local_data_dir, tts_dir, _) = {
+    let (local_data_dir, tts_dir, db) = {
         (state.local_data_dir.clone(), state.tts_dir.clone(), state.db.clone())
     };
 
@@ -62,6 +63,21 @@ pub async fn tts(app: AppHandle, text: String, voice: String, speed: f32) -> Res
             eprintln!("{}: {}", stmt, err);
             stmt
         })?;
+    engine.unload_model();
+    let elapsed = start.elapsed().as_secs_f32();
+    let id = Uuid::new_v4().to_string();
+    let wav_path = wav_path.to_string_lossy().to_string();
+    sqlx::query!(r#"
+        INSERT INTO tts (id, path, ocr_id, time)
+        VALUES ($1, $2, $3, $4)
+    "#, 
+    id,
+    wav_path,
+    text_id,
+    elapsed
+    )
+    .execute(&db)
+    .await.ok();
     
-    Ok(wav_path.to_owned())
+    Ok(wav_path)
 }
