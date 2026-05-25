@@ -9,7 +9,12 @@ export default function Home() {
     <Button
       onClick={() => nav("/tts")}
     >
-      TTS
+      Text To Speech
+    </Button>
+    <Button
+      onClick={() => nav("/ocr")}
+    >
+      Pdf | Image to Text
     </Button>
   </>
 }

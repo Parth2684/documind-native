@@ -4,3 +4,4 @@ pub mod insert_key;
 pub mod ocr;
 mod helpers;
 pub mod tts;
+pub mod gemini_key;

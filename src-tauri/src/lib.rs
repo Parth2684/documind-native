@@ -9,7 +9,7 @@ use tauri::Manager;
 
 mod commands;
 
-use commands::{check_vault::check_vault, unlock_vault::unlock_vault, insert_key::insert_keys, ocr::ocr, tts::tts};
+use commands::{check_vault::check_vault, unlock_vault::unlock_vault, insert_key::insert_keys, ocr::ocr, tts::tts, gemini_key::get_meta};
 use tts_rs::{SynthesisEngine, engines::kokoro::KokoroEngine};
 
 struct AppState {
@@ -123,7 +123,7 @@ pub async fn run() {
             });
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![check_vault, unlock_vault, insert_keys, ocr, tts])
+        .invoke_handler(tauri::generate_handler![check_vault, unlock_vault, insert_keys, ocr, tts, get_meta])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
