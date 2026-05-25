@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Action, State } from './types';
+import { Action, Key, State, Voices } from './types';
 import { invoke } from '@tauri-apps/api/core';
 import toast from "react-hot-toast";
 
@@ -8,6 +8,7 @@ export const store = create<State & Action>((set, get) => ({
   passwordExists: null,
   authorized: false,
   text: "",
+  keys: [],
 
   setPasswordExistance: async () => {
     try {
@@ -42,14 +43,14 @@ export const store = create<State & Action>((set, get) => ({
     set({ text })
   },
 
-  tts: async () => {
+  tts: async (voice: Voices, speed: number) => {
     const start = performance.now()
     let text = get().text;
     try {
       const path = await invoke<string>("tts", {
         text,
-        voice: "af_heart",
-        speed: 1
+        voice,
+        speed
       })
 
       console.log("tts saved at: " + path)
@@ -58,5 +59,16 @@ export const store = create<State & Action>((set, get) => ({
     }
     const end = performance.now();
     console.log(`Execution time: ${end - start} ms`);
+  },
+
+  setKeys: async () => {
+    try {
+      let keys = await invoke<Key[]>("get_meta");
+      set({ keys })
+    }
+    catch (err) {
+      console.error(("Error getting keys: " + err));
+      toast.error("Error Getting Keys");
+    }
   }
 }));
