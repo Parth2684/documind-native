@@ -10,13 +10,15 @@ use tauri::Manager;
 mod commands;
 
 use commands::{check_vault::check_vault, unlock_vault::unlock_vault, insert_key::insert_keys, ocr::ocr, tts::tts};
+use tts_rs::{SynthesisEngine, engines::kokoro::KokoroEngine};
 
 struct AppState {
     db: Pool<Sqlite>,
     local_data_dir: PathBuf,
     stronghold: Mutex<Option<Stronghold>>,
     pdf_images_dir: PathBuf,
-    tts_dir: PathBuf
+    tts_dir: PathBuf,
+    tts_engine: Mutex<KokoroEngine>
 }
 
 
@@ -82,6 +84,33 @@ pub async fn run() {
                     }
                 }
             };
+            let resources_dir = app
+                .path()
+                .resource_dir()
+                .expect("Error Parsinf Resources Directory");
+            if !resources_dir.exists() {
+                panic!("Resource Directory was not found. Please re-install the application")
+            }
+
+            let voices_path = resources_dir.join("models").join("voices-v1.0.bin");
+            if !voices_path.exists() {
+                panic!("Voices Bin not found. Please re install the app");
+            }
+            
+            let tts_model_path = resources_dir
+                .join("models");
+            
+            if !tts_model_path.exists() {
+                panic!("TTS Model Does Not Exists, Please re-install the application");
+            }
+
+            let mut engine = KokoroEngine::new();
+        
+            if let Err(err) = engine.load_model(&tts_model_path) {
+                eprintln!("Error loading engine of the model: {}", err);
+                panic!("Error loading engine of the model")
+            }
+            
             
             
             app.manage(AppState { 
@@ -89,7 +118,8 @@ pub async fn run() {
                 local_data_dir,
                 stronghold: Mutex::new(None),
                 pdf_images_dir,
-                tts_dir
+                tts_dir,
+                tts_engine: Mutex::new(engine)
             });
             Ok(())
         })

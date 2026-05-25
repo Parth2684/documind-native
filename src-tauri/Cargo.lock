@@ -6616,7 +6616,7 @@ checksum = "e421abadd41a4225275504ea4d6566923418b7f05506fbc9c0fe86ba7396114b"
 [[package]]
 name = "tts-rs"
 version = "2026.2.3"
-source = "git+https://github.com/Parth2684/kokoro-rs#d4a5755f05457d891f38c9fb169244e99390124e"
+source = "git+https://github.com/Parth2684/kokoro-rs#20aac1bf180d3d4c4d366864bb7da81a423021a0"
 dependencies = [
  "derive_builder",
  "env_logger",
