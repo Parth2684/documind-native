@@ -3,6 +3,27 @@ export interface Key {
   name: string;
 }
 
+
+export enum Category {
+    Base = "Base",
+    Notes = "Notes",
+    Story = "Story",
+    Music = "Music",
+    Comic = "Comic",
+    Coding = "Coding",
+    Presentation = "Presentation",
+}
+
+
+export enum Model {
+  ThreeFiveFlash = "gemini-3.5-flash",
+  ThreeFlashPreview = "gemini-3-flash-preview",
+  ThreeOneFlashLite = "gemini-3.1-flash-lite",
+  TwoFiveFlash = "gemini-2.5-flash",
+  TwoFiveFlashLite = "gemini-2.5-flash-lite" ,
+}
+
+
 export enum Voices {
   af_heart = "af_heart",
   af_alloy = "af_alloy",
@@ -38,6 +59,7 @@ export type State = {
   authorized: boolean;
   text: string;
   keys: Key[];
+  loading: boolean
 };
 
 export type Action = {
@@ -46,4 +68,5 @@ export type Action = {
   setText: (text: string) => void;
   tts: (voice: Voices, speed: number) => Promise<void>;
   setKeys: () => Promise<void>;
+  ocr: (hash: string, file_paths: Map<number, string>, category: Category, model: Model) => Promise<void>
 };

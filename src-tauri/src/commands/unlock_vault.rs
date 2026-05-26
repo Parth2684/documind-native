@@ -5,8 +5,6 @@ use zeroize::Zeroizing;
 
 use crate::AppState;
 
-
-
 #[tauri::command]
 pub async fn unlock_vault(password: String, app: AppHandle) -> Result<(), String> {
     let state = app.state::<AppState>();
@@ -16,9 +14,7 @@ pub async fn unlock_vault(password: String, app: AppHandle) -> Result<(), String
 
     let stronghold = Stronghold::default();
     let password = sha2::Sha256::digest(password.as_bytes());
-    let key_provider = KeyProvider::try_from(
-            Zeroizing::new(password.to_vec())
-    ).map_err(|err| {
+    let key_provider = KeyProvider::try_from(Zeroizing::new(password.to_vec())).map_err(|err| {
         let stmt = String::from("Error converting password to key provider");
         eprintln!("{}: {}", stmt, err);
         stmt
@@ -34,15 +30,13 @@ pub async fn unlock_vault(password: String, app: AppHandle) -> Result<(), String
                 eprintln!("{}", error);
                 error
             })?;
-    }else {
-        
+    } else {
         let db = state.db.clone();
 
-        stronghold.create_client(b"documind")
-            .map_err(|err| {
-                eprintln!("error creating stronghold client: {}", err);
-                String::from("Error creating stronghold client")
-            })?;
+        stronghold.create_client(b"documind").map_err(|err| {
+            eprintln!("error creating stronghold client: {}", err);
+            String::from("Error creating stronghold client")
+        })?;
         stronghold
             .commit_with_keyprovider(&snapshot, &key_provider)
             .map_err(|err| {
@@ -51,28 +45,27 @@ pub async fn unlock_vault(password: String, app: AppHandle) -> Result<(), String
                 error
             })?;
 
-        
-        sqlx::query!(r#"
+        sqlx::query!(
+            r#"
             INSERT INTO vault (id, present)
             VALUES (1, 1)
-        "#)
+        "#
+        )
         .execute(&db)
-        .await.map_err(|err| {
+        .await
+        .map_err(|err| {
             let stmt = String::from("Error adding vault presense to db");
             eprintln!("{}: {}", stmt, err);
             stmt
         })?;
     }
-    let mut hold = state
-        .stronghold
-        .lock()
-        .map_err(|err| {
-            let stmt = String::from("Error loading stronghold in memory");
-            eprintln!("{}: {}", stmt, err);
-            stmt
-        })?;
-    
+    let mut hold = state.stronghold.lock().map_err(|err| {
+        let stmt = String::from("Error loading stronghold in memory");
+        eprintln!("{}: {}", stmt, err);
+        stmt
+    })?;
+
     *hold = Some(stronghold);
-    
+
     Ok(())
 }

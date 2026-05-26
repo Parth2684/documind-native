@@ -49,3 +49,4 @@ base64 = "0.22.1"
 reqwest = { version = "0.13.3", features = ["json"] }
 tts-rs = { git = "https://github.com/Parth2684/kokoro-rs" }
 sha2 = { version = "0.11.0", features = ["zeroize"] }
+tauri-plugin-dialog = "2"

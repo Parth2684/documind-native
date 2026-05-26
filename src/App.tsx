@@ -5,6 +5,7 @@ import { Route } from 'react-router-dom';
 import Unlock from './pages/Unlock';
 import Home from './pages/Home';
 import Tts from './pages/Tts';
+import Ocr from './pages/Ocr';
 
 function App() {
 
@@ -14,6 +15,7 @@ function App() {
         <Route path='/' element={<Unlock />} />
         <Route path='/home' element={<Home />} />
         <Route path='/tts' element={<Tts />} />
+        <Route path='/ocr' element={<Ocr />} />
       </Routes>
       <Toaster />
     </>

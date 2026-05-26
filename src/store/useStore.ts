@@ -9,7 +9,9 @@ export const store = create<State & Action>((set, get) => ({
   authorized: false,
   text: "",
   keys: [],
+  loading: false, 
 
+  
   setPasswordExistance: async () => {
     try {
       const exists = await invoke<boolean>("check_vault");
@@ -25,6 +27,7 @@ export const store = create<State & Action>((set, get) => ({
   },
 
   setAuth: async (password) => {
+    set({ loading: true })
     try {
       const log = await invoke("unlock_vault", {
         password
@@ -37,6 +40,7 @@ export const store = create<State & Action>((set, get) => ({
       console.error("Error Verifying if User is Valid: " + err);
       toast.error("Wrong Password");
     }
+    set({ loading: false })
   },
 
   setText: (text) => {
@@ -54,6 +58,7 @@ export const store = create<State & Action>((set, get) => ({
       })
 
       console.log("tts saved at: " + path)
+      toast.success("TTS Successfull");
     } catch (err) {
       console.error(("Error doing tts: " + err))
     }
@@ -62,6 +67,7 @@ export const store = create<State & Action>((set, get) => ({
   },
 
   setKeys: async () => {
+    set({ loading: true })
     try {
       let keys = await invoke<Key[]>("get_meta");
       set({ keys })
@@ -70,5 +76,26 @@ export const store = create<State & Action>((set, get) => ({
       console.error(("Error getting keys: " + err));
       toast.error("Error Getting Keys");
     }
+    set({ loading: false })
+  },
+
+  ocr: async (hash, file_paths, category, model) => {
+    set({ loading: true })
+    try {
+      let text = await invoke<string>("ocr" , {
+        hash,
+        file_paths,
+        category,
+        model
+      })
+      set({ text })
+      toast.success("Extracting Text Successfull")
+    } 
+    
+    catch (err) {
+      console.error("Error doing ocr: " + err);
+      toast.error("Error Extracting text")
+    }
+    set({ loading: false })
   }
 }));

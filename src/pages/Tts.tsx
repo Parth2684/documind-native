@@ -5,7 +5,7 @@ import { useState } from 'react';
 
 export default function Tts() {
   const { text, setText, tts } = store();
-  const voices = Object.values(Voices).map(v => v)
+  const voices = Object.values(Voices)
   const [voice, setVoice] = useState<Voices>(Voices.af_heart)
   const [speed, setSpeed] = useState(1);
   return (

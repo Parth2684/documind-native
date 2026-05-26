@@ -3,14 +3,19 @@ use std::{fs, path::PathBuf, sync::Mutex};
 use iota_stronghold::Stronghold;
 
 use sqlx::{
-    Pool, Sqlite, migrate::{Migrator}, sqlite::{SqliteConnectOptions, SqlitePoolOptions}
+    migrate::Migrator,
+    sqlite::{SqliteConnectOptions, SqlitePoolOptions},
+    Pool, Sqlite,
 };
 use tauri::Manager;
 
 mod commands;
 
-use commands::{check_vault::check_vault, unlock_vault::unlock_vault, insert_key::insert_keys, ocr::ocr, tts::tts, gemini_key::get_meta};
-use tts_rs::{SynthesisEngine, engines::kokoro::KokoroEngine};
+use commands::{
+    check_vault::check_vault, gemini_key::get_meta, insert_key::insert_keys, ocr::ocr, tts::tts,
+    unlock_vault::unlock_vault,
+};
+use tts_rs::{engines::kokoro::KokoroEngine, SynthesisEngine};
 
 struct AppState {
     db: Pool<Sqlite>,
@@ -18,9 +23,8 @@ struct AppState {
     stronghold: Mutex<Option<Stronghold>>,
     pdf_images_dir: PathBuf,
     tts_dir: PathBuf,
-    tts_engine: Mutex<KokoroEngine>
+    tts_engine: Mutex<KokoroEngine>,
 }
-
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub async fn run() {
@@ -49,6 +53,7 @@ pub async fn run() {
     MIGRATOR.run(&pool).await.expect("Error Migrating Database");
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             let local_data_dir = app
@@ -59,7 +64,11 @@ pub async fn run() {
                 fs::create_dir_all(&local_data_dir).expect("Error Creating App Local Data Folder");
             }
 
-            let pdf_images_dir = app.path().app_cache_dir().expect("Cache dir is not accessible").join("pdfs");
+            let pdf_images_dir = app
+                .path()
+                .app_cache_dir()
+                .expect("Cache dir is not accessible")
+                .join("pdfs");
             if !pdf_images_dir.exists() {
                 fs::create_dir_all(&pdf_images_dir).expect("Error creating cache dir");
             }
@@ -77,9 +86,9 @@ pub async fn run() {
                                 eprintln!("Error creating audio dir: {}", err);
                                 panic!("Error creating audio dir")
                             }
-                            Ok(_) => tts_dir
+                            Ok(_) => tts_dir,
                         }
-                    }else {
+                    } else {
                         tts_dir
                     }
                 }
@@ -96,34 +105,38 @@ pub async fn run() {
             if !voices_path.exists() {
                 panic!("Voices Bin not found. Please re install the app");
             }
-            
-            let tts_model_path = resources_dir
-                .join("models");
-            
+
+            let tts_model_path = resources_dir.join("models");
+
             if !tts_model_path.exists() {
                 panic!("TTS Model Does Not Exists, Please re-install the application");
             }
 
             let mut engine = KokoroEngine::new();
-        
+
             if let Err(err) = engine.load_model(&tts_model_path) {
                 eprintln!("Error loading engine of the model: {}", err);
                 panic!("Error loading engine of the model")
             }
-            
-            
-            
-            app.manage(AppState { 
+
+            app.manage(AppState {
                 db: pool,
                 local_data_dir,
                 stronghold: Mutex::new(None),
                 pdf_images_dir,
                 tts_dir,
-                tts_engine: Mutex::new(engine)
+                tts_engine: Mutex::new(engine),
             });
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![check_vault, unlock_vault, insert_keys, ocr, tts, get_meta])
+        .invoke_handler(tauri::generate_handler![
+            check_vault,
+            unlock_vault,
+            insert_keys,
+            ocr,
+            tts,
+            get_meta
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
