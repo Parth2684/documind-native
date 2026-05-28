@@ -10,6 +10,9 @@ edition = "2021"
 [profile.dev]
 incremental = true # Compile your binary in smaller steps.
 
+[profile.dev.package.scrypt]
+opt-level = 3
+
 [profile.release]
 codegen-units = 1 # Allows LLVM to perform better optimization.
 lto = true # Enables link-time-optimizations.
@@ -36,7 +39,6 @@ serde_json = "1"
 sqlx = { version = "0.8.6", features = ["chrono", "macros", "migrate", "runtime-tokio", "sqlite"] }
 tokio = { version = "1.52.3", features = ["full"] }
 dirs = "6.0.0"
-tauri-plugin-stronghold = "2"
 iota_stronghold = "2.1.0"
 crypto = "0.5.1"
 zeroize = "1.8.2"
