@@ -97,5 +97,36 @@ export const store = create<State & Action>((set, get) => ({
       toast.error("Error Extracting text")
     }
     set({ loading: false })
+  },
+
+  addKey: async (name, key) => {
+    set({ loading: true });
+    try {
+      const addKey = await invoke<Key>("insert_keys", {
+        name,
+        key
+      });
+      set((state) => ({
+        keys: [...state.keys, addKey]
+      }))
+    } catch (err) {
+      console.error("Error adding key: " + err)
+      toast.error("Key Could'nt be added try again")
+    }
+  },
+
+  deleteKey: async (hash) => {
+    set({ loading: true })
+    try {
+      await invoke("delete_key", {
+        hash
+      });
+      let keys = [...get().keys];
+      keys.filter((k) => k.hash === hash);
+      set({ keys })
+    } catch (err) {
+      console.error("Error deleting key: " + err);
+      toast.error("Error Deleteing key")
+    }
   }
 }));

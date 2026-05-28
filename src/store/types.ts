@@ -69,4 +69,6 @@ export type Action = {
   tts: (voice: Voices, speed: number) => Promise<void>;
   setKeys: () => Promise<void>;
   ocr: (hash: string, file_paths: Map<number, string>, category: Category, model: Model) => Promise<void>
+  addKey: (name: string, key: string) => Promise<void>
+  deleteKey: (hash: string) => Promise<void>;
 };
