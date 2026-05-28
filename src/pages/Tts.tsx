@@ -36,7 +36,7 @@ export default function Tts() {
                   setText(e.target.value)
                 }}
                 placeholder="Type or paste your text here..."
-                className="flex min-h-[200px] w-full rounded-lg border border-input bg-background px-4 py-3 text-sm placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+                className="flex min-h-50 w-full rounded-lg border border-input bg-background px-4 py-3 text-sm placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 resize-none"
               />
             </div>
           </div>
@@ -103,7 +103,7 @@ export default function Tts() {
             {/* Info Card */}
             <div className="rounded-xl border border-border bg-card p-6 shadow-sm space-y-3">
               <div className="flex items-start gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 flex-shrink-0">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 shrink-0">
                   <svg className="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>

@@ -56,7 +56,7 @@ export default function Ocr() {
   }
   if (keys.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-linear-to-br from-background to-muted/20 flex items-center justify-center p-6">
         <div className="max-w-md w-full">
           <div className="rounded-xl border border-border bg-card p-8 shadow-sm text-center space-y-6">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted mx-auto">
@@ -83,7 +83,7 @@ export default function Ocr() {
     )
   }
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 p-6">
+    <div className="min-h-screen bg-linear-to-br from-background to-muted/20 p-6">
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -237,7 +237,7 @@ export default function Ocr() {
                 <textarea
                   value={text}
                   onChange={(e) => setText(e.target.value)}
-                  className="flex min-h-[300px] w-full rounded-lg border border-input bg-background px-4 py-3 text-sm placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+                  className="flex min-h-75 w-full rounded-lg border border-input bg-background px-4 py-3 text-sm placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 resize-none"
                   placeholder="Extracted text will appear here..."
                 />
                 <Button

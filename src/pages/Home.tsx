@@ -6,7 +6,7 @@ import { Button } from '../components/ui/button';
 export default function Home() {
   const nav = useNavigate()
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-linear-to-br from-background to-muted/20 flex items-center justify-center p-6">
       <div className="max-w-4xl w-full space-y-12">
         {/* Header */}
         <div className="text-center space-y-4">
@@ -60,6 +60,50 @@ export default function Home() {
               </div>
               <Button
                 onClick={() => nav("/ocr")}
+                className="w-full"
+                size="lg"
+              >
+                Get Started
+              </Button>
+            </div>
+          </div>
+          <div className="group relative overflow-hidden rounded-xl border border-border bg-card p-6 shadow-sm transition-all hover:shadow-md hover:border-primary/50">
+            <div className="space-y-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                <svg className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15.536a5 5 0 001.414 1.414m2.828-9.9a9 9 0 012.828-2.828" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-card-foreground">Manage Keys</h2>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Add or Delete Gemini Keys used for OCR
+                </p>
+              </div>
+              <Button
+                onClick={() => nav("/tts")}
+                className="w-full"
+                size="lg"
+              >
+                Get Started
+              </Button>
+            </div>
+          </div>
+          <div className="group relative overflow-hidden rounded-xl border border-border bg-card p-6 shadow-sm transition-all hover:shadow-md hover:border-primary/50">
+            <div className="space-y-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                <svg className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15.536a5 5 0 001.414 1.414m2.828-9.9a9 9 0 012.828-2.828" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-card-foreground">History</h2>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Check Your OCR and TTS History
+                </p>
+              </div>
+              <Button
+                onClick={() => nav("/tts")}
                 className="w-full"
                 size="lg"
               >

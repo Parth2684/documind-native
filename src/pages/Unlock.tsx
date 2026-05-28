@@ -11,7 +11,8 @@ export default function Unlock() {
   const [initialPassword, setInitialPassword] = useState<string>("");
   const [finalPassword, setFinalPassword] = useState<string>("");
   useEffect(() => {
-    setPasswordExistance();
+    const call = async () => await setPasswordExistance();
+    call()
   }, []);
   useEffect(() => {
     if (authorized) {
@@ -54,7 +55,7 @@ export default function Unlock() {
     );
   }
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-linear-to-br from-background to-muted/20 flex items-center justify-center p-6">
       <div className="w-full max-w-md">
         <div className="rounded-xl border border-border bg-card p-8 shadow-sm">
           {/* Header */}

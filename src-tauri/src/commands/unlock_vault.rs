@@ -53,11 +53,7 @@ pub async fn unlock_vault(password: String, app: AppHandle) -> Result<(), String
         )
         .execute(&db)
         .await
-        .map_err(|err| {
-            let stmt = String::from("Error adding vault presense to db");
-            eprintln!("{}: {}", stmt, err);
-            stmt
-        })?;
+        .ok();
     }
     let mut hold = state.stronghold.lock().map_err(|err| {
         let stmt = String::from("Error loading stronghold in memory");

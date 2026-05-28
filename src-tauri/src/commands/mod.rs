@@ -6,3 +6,4 @@ pub mod ocr;
 pub mod tts;
 pub mod unlock_vault;
 pub mod delete_key;
+pub mod history;
