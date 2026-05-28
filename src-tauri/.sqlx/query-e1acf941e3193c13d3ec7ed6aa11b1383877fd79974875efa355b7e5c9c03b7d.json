@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        DELETE FROM gemini_keys\n        WHERE hash = $1\n    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "e1acf941e3193c13d3ec7ed6aa11b1383877fd79974875efa355b7e5c9c03b7d"
+}

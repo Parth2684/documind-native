@@ -1,11 +1,18 @@
 use blake3::hash;
 use iota_stronghold::SnapshotPath;
+use serde::Serialize;
 use tauri::{AppHandle, Manager};
 
 use crate::AppState;
 
+#[derive(Serialize)]
+pub struct Key {
+    name: String,
+    hash: String
+}
+
 #[tauri::command]
-pub async fn insert_keys(app: AppHandle, name: String, key: String) -> Result<(), String> {
+pub async fn insert_keys(app: AppHandle, name: String, key: String) -> Result<Key, String> {
     let hash = hash(key.as_bytes()).to_string();
     let state = app.state::<AppState>();
     let db = state.db.clone();
@@ -89,7 +96,7 @@ pub async fn insert_keys(app: AppHandle, name: String, key: String) -> Result<()
                 eprintln!("{}: {}", stmt, err);
                 stmt
             })?;
-            Ok(())
+            Ok(Key { name, hash })
         }
         (Ok(Some(_)), Ok(None)) => {
             return Err(String::from("gemini key exists with different name"))

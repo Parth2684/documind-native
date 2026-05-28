@@ -5,3 +5,4 @@ pub mod insert_key;
 pub mod ocr;
 pub mod tts;
 pub mod unlock_vault;
+pub mod delete_key;
