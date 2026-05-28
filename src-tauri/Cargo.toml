@@ -13,6 +13,11 @@ incremental = true # Compile your binary in smaller steps.
 [profile.dev.package.scrypt]
 opt-level = 3
 
+
+[profile.release.package."*"]
+opt-level = 3
+
+
 [profile.release]
 codegen-units = 1 # Allows LLVM to perform better optimization.
 lto = true # Enables link-time-optimizations.
