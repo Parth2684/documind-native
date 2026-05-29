@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 use chrono::{Local, NaiveDateTime, TimeZone, Utc};
 use serde::Serialize;
 use tauri::{AppHandle, Manager};
@@ -7,14 +5,14 @@ use tauri::{AppHandle, Manager};
 use crate::AppState;
 
 #[derive(Serialize)]
-struct Text {
+pub struct Text {
     id: String,
     text: String,
     created_at: Option<NaiveDateTime> ,
 }
 
 #[derive(Serialize)]
-struct Audio {
+pub struct Audio {
     id: String,
     path: String,
     created_at: Option<NaiveDateTime> ,
@@ -23,13 +21,18 @@ struct Audio {
 }
 
 #[derive(Serialize)]
-struct History {
+pub struct History {
     created_at: NaiveDateTime,
     text: Option<Text>,
     audio: Option<Audio>,
 }
 
-pub async fn history(app: AppHandle) -> Result<(), String> {
+fn utc_to_local(time: &NaiveDateTime) -> NaiveDateTime {
+    Utc.from_utc_datetime(time).with_timezone(&Local).naive_local()
+}
+
+#[tauri::command]
+pub async fn history(app: AppHandle) -> Result<Vec<History>, String> {
     let db = { app.state::<AppState>().db.clone() };
 
     let (tts_ocr, tts, ocr) = tokio::join!(sqlx::query!(r#"
@@ -71,6 +74,43 @@ pub async fn history(app: AppHandle) -> Result<(), String> {
             eprintln!("{}: {}", stmt, err);
             stmt
         })?;
-    
-    Ok(())
+
+    let mut history: Vec<History> = Vec::new();
+    tts_ocr.into_iter().for_each(|to| {
+        let created_at = utc_to_local(&to.tts_created_at.unwrap());
+        history.push(History { created_at, text: Some(Text {
+            id: to.id,
+            text: to.text,
+            created_at: Some(utc_to_local(&to.created_at.unwrap()))
+        }), audio: Some(Audio {
+            id: to.tts_id,
+            path: to.path,
+            created_at: Some(created_at),
+            time: to.time,
+            ocr_id: to.ocr_id
+        }) });
+    });
+
+    tts.into_iter().for_each(|t| {
+        let created_at = utc_to_local(&t.created_at.unwrap());
+        history.push(History { created_at, text: None, audio: Some(Audio {
+            id: t.id,
+            path: t.path,
+            created_at: Some(created_at),
+            time: t.time,
+            ocr_id: None
+        }) });
+    });
+
+    ocr.into_iter().for_each(|o| {
+        let created_at = utc_to_local(&o.created_at.unwrap());
+        history.push(History { created_at, text: Some(Text {
+            id: o.id,
+            created_at: Some(created_at),
+            text: o.text
+        }), audio: None });
+    });
+
+    history.sort_by(|a, b| b.created_at.cmp(&a.created_at));
+    Ok(history)
 }
