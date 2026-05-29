@@ -1,0 +1,62 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT t.id as tts_id, t.created_at as tts_created_at, t.time, t.ocr_id, t.path, o.id, o.text, o.created_at\n        FROM tts t\n        INNER JOIN ocr_text o ON o.id = t.ocr_id \n    ",
+  "describe": {
+    "columns": [
+      {
+        "name": "tts_id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "tts_created_at",
+        "ordinal": 1,
+        "type_info": "Datetime"
+      },
+      {
+        "name": "time",
+        "ordinal": 2,
+        "type_info": "Float"
+      },
+      {
+        "name": "ocr_id",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "path",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "id",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "text",
+        "ordinal": 6,
+        "type_info": "Text"
+      },
+      {
+        "name": "created_at",
+        "ordinal": 7,
+        "type_info": "Datetime"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      true,
+      false,
+      true,
+      false,
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "9f6304ad72a7b928392bbf7f33ccffc610ee2e598230f39ce94e6535d16bbaf4"
+}

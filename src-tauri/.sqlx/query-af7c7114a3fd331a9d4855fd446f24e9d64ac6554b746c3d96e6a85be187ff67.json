@@ -1,0 +1,32 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT o.id, o.text, o.created_at\n        FROM ocr_text o\n        LEFT JOIN tts t ON t.ocr_id = o.id\n        WHERE t.id is NULL\n    ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "text",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "created_at",
+        "ordinal": 2,
+        "type_info": "Datetime"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "af7c7114a3fd331a9d4855fd446f24e9d64ac6554b746c3d96e6a85be187ff67"
+}
