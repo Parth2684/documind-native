@@ -14,6 +14,22 @@ export enum Category {
     Presentation = "Presentation",
 }
 
+export interface History {
+  created_at: string;
+  text: {
+    id: string;
+    text: string;
+    created_at: string;
+  } | null,
+  audio: {
+    id: string;
+    path: string;
+    created_at: string;
+    time: number;
+    ocr_id: string | null
+  } | null
+}
+
 
 export enum Model {
   ThreeFiveFlash = "gemini-3.5-flash",
@@ -59,7 +75,8 @@ export type State = {
   authorized: boolean;
   text: string;
   keys: Key[];
-  loading: boolean
+  loading: boolean;
+  history: History[]
 };
 
 export type Action = {
@@ -71,4 +88,5 @@ export type Action = {
   ocr: (hash: string, file_paths: Map<number, string>, category: Category, model: Model) => Promise<void>
   addKey: (name: string, key: string) => Promise<void>
   deleteKey: (hash: string) => Promise<void>;
+  setHistory: () => Promise<void>
 };

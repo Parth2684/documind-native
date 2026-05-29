@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Action, Key, State, Voices } from './types';
+import { Action, History, Key, State, Voices } from './types';
 import { invoke } from '@tauri-apps/api/core';
 import toast from "react-hot-toast";
 
@@ -10,6 +10,7 @@ export const store = create<State & Action>((set, get) => ({
   text: "",
   keys: [],
   loading: false, 
+  history: [],
 
   
   setPasswordExistance: async () => {
@@ -127,6 +128,17 @@ export const store = create<State & Action>((set, get) => ({
     } catch (err) {
       console.error("Error deleting key: " + err);
       toast.error("Error Deleteing key")
+    }
+  },
+
+  setHistory: async() => {
+    set({ loading: true })
+    try {
+      const history = await invoke<History[]>("history");
+      set({ history })
+    } catch (err) {
+      console.error("error getting history: " + err);
+      toast.error("Error getting history")
     }
   }
 }));
