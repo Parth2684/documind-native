@@ -45,26 +45,10 @@ Documind is a privacy-focused native desktop application that transforms documen
 
 ---
 
-## Tech Stack
-
-### Frontend
-
-* React
-* TypeScript
-* Vite
-* Zustand
-* Tailwind CSS
-* shadcn/ui
-
-### Backend
-
-* Rust
-* Tauri
-* Tokio
-* SQLx + SQLite
-* iota-stronghold
-* reqwest
-* Kokoro ONNX Runtime
+## 🛠️ Tech Stack
+*   **Frontend:** React, TypeScript, Zustand, React Router DOM, Tailwind CSS, Vite
+*   **Backend (Rust/Tauri):** Rust, Tauri, SQLx (SQLite), Tokio, IOTA Stronghold, tts-rs (custom TTS library), pdf2image, reqwest, blake3, sha2, serde, Kokoro ONNX Runtime
+*   **Tooling:** Bun, ESLint
 
 ### AI Models
 
