@@ -135,6 +135,15 @@ export const store = create<State & Action>((set, get) => ({
     set({ loading: true })
     try {
       const history = await invoke<History[]>("history");
+      history.forEach((h) => {
+        h.created_at = new Date(h.created_at).toLocaleString();
+        if (h.audio?.created_at) {
+          h.audio.created_at = new Date(h.audio.created_at).toLocaleString()
+        }
+        if (h.text?.created_at) {
+          h.text.created_at = new Date(h.text.created_at).toLocaleString()
+        }
+      })
       set({ history })
     } catch (err) {
       console.error("error getting history: " + err);
