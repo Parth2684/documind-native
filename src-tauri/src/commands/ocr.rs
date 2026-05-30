@@ -95,7 +95,7 @@ pub async fn ocr(
             stmt
         })?;
 
-        let strongholdcandidates = stronghold_lock
+        let stronghold = stronghold_lock
             .as_ref()
             .ok_or(String::from("No Stronghold found"))?;
 
