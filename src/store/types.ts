@@ -89,4 +89,5 @@ export type Action = {
   addKey: (name: string, key: string) => Promise<void>
   deleteKey: (hash: string) => Promise<void>;
   setHistory: () => Promise<void>
+  deleteRecord: (ocr_id: string | null, tts_id: string | null, delete_from_fs: string | null) => Promise<void>
 };

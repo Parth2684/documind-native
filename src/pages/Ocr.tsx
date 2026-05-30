@@ -83,7 +83,7 @@ export default function Ocr() {
     )
   }
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 p-6">
+    <div className="min-h-screen bg-linear-to-br from-background to-muted/20 p-6">
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">

@@ -13,7 +13,7 @@ mod commands;
 
 use commands::{
     check_vault::check_vault, gemini_key::get_meta, insert_key::insert_keys, ocr::ocr, tts::tts,
-    unlock_vault::unlock_vault, delete_key::delete_key, history::history
+    unlock_vault::unlock_vault, delete_key::delete_key, history::history, delete_record::delete_record
 };
 use tts_rs::{engines::kokoro::KokoroEngine, SynthesisEngine};
 
@@ -137,7 +137,8 @@ pub async fn run() {
             tts,
             get_meta,
             delete_key,
-            history
+            history,
+            delete_record
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

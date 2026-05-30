@@ -6,7 +6,7 @@ import { Button } from '../components/ui/button';
 export default function Home() {
   const nav = useNavigate()
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-linear-to-br from-background to-muted/20 flex items-center justify-center p-6">
       <div className="max-w-4xl w-full space-y-12">
         {/* Header */}
         <div className="text-center space-y-4">

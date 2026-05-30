@@ -150,5 +150,22 @@ export const store = create<State & Action>((set, get) => ({
       toast.error("Error getting history")
     }
     set({ loading: false })
+  },
+
+  deleteRecord: async (ocr_id, tts_id, delete_from_fs) => {
+    try {
+      await invoke("delete_record", {
+        ocr_id,
+        tts_id,
+        delete_from_fs
+      })
+
+      let history = get().history
+      history.filter((h) => h.audio?.id === tts_id || h.text?.id === ocr_id);
+      set({ history })
+    } catch (err) {
+      console.error("error deleting record: " + err);
+      toast.error("Error deleting record")
+    }
   }
 }));

@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        DELETE FROM ocr_text \n        WHERE id = $1\n    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "5855bbc51b5b1ee8f64767c9391dced22f6fe8059a28c4d635474bc04d895d92"
+}
