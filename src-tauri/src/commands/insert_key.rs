@@ -66,7 +66,7 @@ pub async fn insert_keys(app: AppHandle, name: String, key: String) -> Result<Ke
                     .as_mut()
                     .ok_or(String::from("Stronghold not initialized"))?;
 
-                let client = stronghold.get_client(b"documind").map_err(|err| {
+                let client = stronghold.load_client(b"documind").map_err(|err| {
                     eprintln!("Error getting stronghold client: {}", err);
                     String::from("Error getting stronghold client")
                 })?;
@@ -85,7 +85,16 @@ pub async fn insert_keys(app: AppHandle, name: String, key: String) -> Result<Ke
                 let vault_path = local_data_dir.join("vault.hold");
                 let snapshot = SnapshotPath::from_path(&vault_path);
 
-                stronghold.commit(&snapshot).map_err(|err| {
+               
+                let key = state.key_provider.lock().map_err(|err| {
+                    let stmt = String::from("Error reading keyprovider");
+                    eprintln!("{}: {}", stmt, err);
+                    stmt
+                })?;
+                let key_provider = key.as_ref().unwrap();
+               
+
+                stronghold.commit_with_keyprovider(&snapshot, &key_provider).map_err(|err| {
                     let stmt = String::from("Error Commiting to snapshot");
                     eprintln!("{}: {}", stmt, err);
                     stmt

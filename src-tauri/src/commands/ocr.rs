@@ -14,10 +14,11 @@ use crate::{
     AppState,
 };
 use base64::{engine::general_purpose::STANDARD, Engine};
-use pdf2image::{image, RenderOptionsBuilder, PDF};
+use pdf2image::{RenderOptionsBuilder, PDF};
 use serde::{self, Deserialize, Serialize};
 use tauri::{AppHandle, Emitter, Manager};
 use uuid::Uuid;
+use image;
 
 #[derive(Deserialize)]
 pub enum Category {
@@ -94,11 +95,11 @@ pub async fn ocr(
             stmt
         })?;
 
-        let stronghold = stronghold_lock
+        let strongholdcandidates = stronghold_lock
             .as_ref()
             .ok_or(String::from("No Stronghold found"))?;
 
-        let client = stronghold.get_client(b"documind").map_err(|err| {
+        let client = stronghold.load_client(b"documind").map_err(|err| {
             let stmt = String::from("Error getting client");
             eprintln!("{}: {}", stmt, err);
             stmt
@@ -156,11 +157,7 @@ pub async fn ocr(
                                     return;
                                 }
                                 Ok(img) => {
-                                    let name = match path.file_name() {
-                                        None => Uuid::new_v4().to_string(),
-                                        Some(name) => name.to_string_lossy().to_string(),
-                                    };
-                                    let webp_path = &state.pdf_images_dir.join(name);
+                                    let webp_path = &state.pdf_images_dir.join(format!("{}.webp", Uuid::new_v4()));
                                     match img.save_with_format(&webp_path, image::ImageFormat::WebP)
                                     {
                                         Err(err) => {
@@ -226,13 +223,10 @@ pub async fn ocr(
                             let pdf_dir = &state.pdf_images_dir.join(pdf_name);
                             fs::create_dir_all(pdf_dir).ok();
                             for page in pages {
-                                let file_name = match &path.file_name() {
-                                    None => Uuid::new_v4().to_string(),
-                                    Some(name) => name.to_string_lossy().to_string(),
-                                };
+                                let file_name = format!("{}.webp", Uuid::new_v4());
                                 let img_dir = pdf_dir.join(file_name);
                                 match page
-                                    .save_with_format(&img_dir, pdf2image::image::ImageFormat::WebP)
+                                    .save_with_format(&img_dir, image::ImageFormat::WebP)
                                 {
                                     Err(err) => {
                                         eprintln!("Error saving image: {}", err);
@@ -310,6 +304,7 @@ pub async fn ocr(
                     ocr_text.push_str(&data.candidates[0].content.parts[0].text);
                 }
                 Err(err) => {
+                    
                     eprintln!("Error from Gemini: {}", err);
                     app.emit("error_ocr", format!("err from gemini: {}", err))
                         .ok();

@@ -80,12 +80,12 @@ export const store = create<State & Action>((set, get) => ({
     set({ loading: false })
   },
 
-  ocr: async (hash, file_paths, category, model) => {
+  ocr: async (hash, filePaths, category, model) => {
     set({ loading: true })
     try {
       let text = await invoke<string>("ocr" , {
         hash,
-        file_paths,
+        filePaths,
         category,
         model
       })

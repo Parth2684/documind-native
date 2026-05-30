@@ -41,6 +41,7 @@ pub async fn unlock_vault(password: String, app: AppHandle) -> Result<(), String
                 eprintln!("{}", error);
                 error
             })?;
+        
 
     } else {
         let db = state.db.clone();
@@ -72,8 +73,14 @@ pub async fn unlock_vault(password: String, app: AppHandle) -> Result<(), String
         eprintln!("{}: {}", stmt, err);
         stmt
     })?;
+   
+    let mut key = state.key_provider.lock().map_err(|err| {
+        let stmt = String::from("Error loading keyprovider in memory");
+        eprintln!("{}: {}", stmt, err);
+        stmt
+    })?;
 
     *hold = Some(stronghold);
-
+    *key = Some(key_provider);
     Ok(())
 }
