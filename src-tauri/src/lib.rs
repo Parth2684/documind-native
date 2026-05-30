@@ -12,8 +12,9 @@ use tauri::Manager;
 mod commands;
 
 use commands::{
-    check_vault::check_vault, gemini_key::get_meta, insert_key::insert_keys, ocr::ocr, tts::tts,
-    unlock_vault::unlock_vault, delete_key::delete_key, history::history, delete_record::delete_record
+    check_vault::check_vault, delete_key::delete_key, delete_record::delete_record,
+    gemini_key::get_meta, history::history, insert_key::insert_keys, ocr::ocr, tts::tts,
+    unlock_vault::unlock_vault,
 };
 use tts_rs::{engines::kokoro::KokoroEngine, SynthesisEngine};
 
@@ -24,7 +25,7 @@ struct AppState {
     pdf_images_dir: PathBuf,
     tts_dir: PathBuf,
     tts_engine: Mutex<KokoroEngine>,
-    key_provider: Mutex<Option<KeyProvider>>
+    key_provider: Mutex<Option<KeyProvider>>,
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -127,7 +128,7 @@ pub async fn run() {
                 pdf_images_dir,
                 tts_dir,
                 tts_engine: Mutex::new(engine),
-                key_provider: Mutex::new(None)
+                key_provider: Mutex::new(None),
             });
             Ok(())
         })

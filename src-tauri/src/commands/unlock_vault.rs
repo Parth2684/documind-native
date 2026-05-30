@@ -22,10 +22,13 @@ pub async fn unlock_vault(password: String, app: AppHandle) -> Result<(), String
 
     let snapshot = SnapshotPath::from_path(&vault_path);
 
-    let vault_exists = sqlx::query!(r#"
+    let vault_exists = sqlx::query!(
+        r#"
         SELECT * from vault
         WHERE id = 1
-    "#).fetch_optional(&db)
+    "#
+    )
+    .fetch_optional(&db)
     .await
     .map_err(|err| {
         let stmt = String::from("Error getting presense of vault");
@@ -41,8 +44,6 @@ pub async fn unlock_vault(password: String, app: AppHandle) -> Result<(), String
                 eprintln!("{}", error);
                 error
             })?;
-        
-
     } else {
         let db = state.db.clone();
 
@@ -73,7 +74,7 @@ pub async fn unlock_vault(password: String, app: AppHandle) -> Result<(), String
         eprintln!("{}: {}", stmt, err);
         stmt
     })?;
-   
+
     let mut key = state.key_provider.lock().map_err(|err| {
         let stmt = String::from("Error loading keyprovider in memory");
         eprintln!("{}: {}", stmt, err);

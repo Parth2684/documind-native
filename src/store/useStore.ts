@@ -144,6 +144,7 @@ export const store = create<State & Action>((set, get) => ({
           h.text.created_at = new Date(h.text.created_at).toLocaleString()
         }
       })
+      console.log(history)
       set({ history })
     } catch (err) {
       console.error("error getting history: " + err);

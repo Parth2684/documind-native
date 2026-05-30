@@ -14,11 +14,11 @@ use crate::{
     AppState,
 };
 use base64::{engine::general_purpose::STANDARD, Engine};
+use image;
 use pdf2image::{RenderOptionsBuilder, PDF};
 use serde::{self, Deserialize, Serialize};
 use tauri::{AppHandle, Emitter, Manager};
 use uuid::Uuid;
-use image;
 
 #[derive(Deserialize)]
 pub enum Category {
@@ -55,28 +55,26 @@ pub enum Model {
 #[derive(Serialize)]
 struct Prompt {
     model: Model,
-    system_instructions: String,
+    system_instruction: String,
     input: Vec<Input>,
 }
 
-#[derive(Deserialize)]
-struct Text {
-    text: String,
-}
-
-#[derive(Deserialize)]
-struct Content {
-    parts: [Text; 1],
-}
-
-#[derive(Deserialize)]
-struct Candidate {
-    content: Content,
-}
-
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 struct GeminiResponse {
-    candidates: [Candidate; 1],
+    steps: Vec<Step>,
+}
+
+#[derive(Debug, Deserialize)]
+struct Step {
+    #[serde(rename = "type")]
+    step_type: String,
+
+    content: Option<Vec<Content>>,
+}
+
+#[derive(Debug, Deserialize)]
+struct Content {
+    text: String,
 }
 
 #[tauri::command]
@@ -157,7 +155,9 @@ pub async fn ocr(
                                     return;
                                 }
                                 Ok(img) => {
-                                    let webp_path = &state.pdf_images_dir.join(format!("{}.webp", Uuid::new_v4()));
+                                    let webp_path = &state
+                                        .pdf_images_dir
+                                        .join(format!("{}.webp", Uuid::new_v4()));
                                     match img.save_with_format(&webp_path, image::ImageFormat::WebP)
                                     {
                                         Err(err) => {
@@ -225,9 +225,7 @@ pub async fn ocr(
                             for page in pages {
                                 let file_name = format!("{}.webp", Uuid::new_v4());
                                 let img_dir = pdf_dir.join(file_name);
-                                match page
-                                    .save_with_format(&img_dir, image::ImageFormat::WebP)
-                                {
+                                match page.save_with_format(&img_dir, image::ImageFormat::WebP) {
                                     Err(err) => {
                                         eprintln!("Error saving image: {}", err);
                                         continue;
@@ -286,7 +284,7 @@ pub async fn ocr(
             .header("Api-Revision", "2026-05-20")
             .json(&Prompt {
                 model: model.clone(),
-                system_instructions: system_instructions.clone(),
+                system_instruction: system_instructions.clone(),
                 input: input_vec,
             })
             .send()
@@ -299,17 +297,41 @@ pub async fn ocr(
                 app.emit("error_ocr", stmt).ok();
                 continue;
             }
-            Ok(response) => match response.json::<GeminiResponse>().await {
-                Ok(data) => {
-                    ocr_text.push_str(&data.candidates[0].content.parts[0].text);
-                }
-                Err(err) => {
-                    
-                    eprintln!("Error from Gemini: {}", err);
-                    app.emit("error_ocr", format!("err from gemini: {}", err))
+            Ok(response) => {
+                dbg!(&response);
+                let body = match response.text().await {
+                    Ok(body) => body,
+                    Err(err) => {
+                        eprintln!("Error reading response body: {}", err);
+                        continue;
+                    }
+                };
+                dbg!(&body);
+
+                match serde_json::from_str::<GeminiResponse>(&body) {
+                    Ok(data) => {
+                        for step in &data.steps {
+                            if step.step_type == "model_output" {
+                                if let Some(content) = &step.content {
+                                    for item in content {
+                                        ocr_text.push_str(&item.text);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Err(err) => {
+                        eprintln!("Error decoding Gemini response: {}", err);
+                        eprintln!("Raw response body:\n{}", body);
+
+                        app.emit(
+                            "error_ocr",
+                            format!("Error decoding Gemini response: {}", err),
+                        )
                         .ok();
+                    }
                 }
-            },
+            }
         }
 
         if webp_queue.is_empty() {

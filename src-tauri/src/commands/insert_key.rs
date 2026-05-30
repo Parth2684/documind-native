@@ -8,7 +8,7 @@ use crate::AppState;
 #[derive(Serialize)]
 pub struct Key {
     name: String,
-    hash: String
+    hash: String,
 }
 
 #[tauri::command]
@@ -85,20 +85,20 @@ pub async fn insert_keys(app: AppHandle, name: String, key: String) -> Result<Ke
                 let vault_path = local_data_dir.join("vault.hold");
                 let snapshot = SnapshotPath::from_path(&vault_path);
 
-               
                 let key = state.key_provider.lock().map_err(|err| {
                     let stmt = String::from("Error reading keyprovider");
                     eprintln!("{}: {}", stmt, err);
                     stmt
                 })?;
                 let key_provider = key.as_ref().unwrap();
-               
 
-                stronghold.commit_with_keyprovider(&snapshot, &key_provider).map_err(|err| {
-                    let stmt = String::from("Error Commiting to snapshot");
-                    eprintln!("{}: {}", stmt, err);
-                    stmt
-                })?;
+                stronghold
+                    .commit_with_keyprovider(&snapshot, &key_provider)
+                    .map_err(|err| {
+                        let stmt = String::from("Error Commiting to snapshot");
+                        eprintln!("{}: {}", stmt, err);
+                        stmt
+                    })?;
             }
             tx.commit().await.map_err(|err| {
                 let stmt = String::from("Error commiting key metadata to db");

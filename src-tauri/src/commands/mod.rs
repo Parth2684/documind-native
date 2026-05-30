@@ -1,10 +1,10 @@
 pub mod check_vault;
+pub mod delete_key;
+pub mod delete_record;
 pub mod gemini_key;
 mod helpers;
+pub mod history;
 pub mod insert_key;
 pub mod ocr;
 pub mod tts;
 pub mod unlock_vault;
-pub mod delete_key;
-pub mod history;
-pub mod delete_record;
