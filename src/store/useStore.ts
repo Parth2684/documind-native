@@ -122,8 +122,7 @@ export const store = create<State & Action>((set, get) => ({
       await invoke("delete_key", {
         hash
       });
-      let keys = [...get().keys];
-      keys.filter((k) => k.hash === hash);
+      const keys = get().keys.filter((k) => k.hash !== hash);
       set({ keys })
     } catch (err) {
       console.error("Error deleting key: " + err);

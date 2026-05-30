@@ -1,6 +1,6 @@
 use std::{fs, path::PathBuf, sync::Mutex};
 
-use iota_stronghold::{KeyProvider, Stronghold};
+use iota_stronghold::{Client, KeyProvider, Stronghold};
 
 use sqlx::{
     migrate::Migrator,
@@ -26,6 +26,7 @@ struct AppState {
     tts_dir: PathBuf,
     tts_engine: Mutex<KokoroEngine>,
     key_provider: Mutex<Option<KeyProvider>>,
+    client: Mutex<Option<Client>>
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -129,6 +130,7 @@ pub async fn run() {
                 tts_dir,
                 tts_engine: Mutex::new(engine),
                 key_provider: Mutex::new(None),
+                client: Mutex::new(None)
             });
             Ok(())
         })

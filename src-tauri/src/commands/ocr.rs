@@ -87,21 +87,16 @@ pub async fn ocr(
 ) -> Result<String, String> {
     let state = app.state::<AppState>();
     let key = {
-        let stronghold_lock = state.stronghold.lock().map_err(|err| {
-            let stmt = String::from("Error getting Stronghold");
+
+        let mut client = state.client.lock().map_err(|err| {
+            let stmt = String::from("Error getting lock on client");
             eprintln!("{}: {}", stmt, err);
             stmt
         })?;
 
-        let stronghold = stronghold_lock
-            .as_ref()
-            .ok_or(String::from("No Stronghold found"))?;
-
-        let client = stronghold.load_client(b"documind").map_err(|err| {
-            let stmt = String::from("Error getting client");
-            eprintln!("{}: {}", stmt, err);
-            stmt
-        })?;
+        let client = client
+            .as_mut()
+            .ok_or(String::from("Client not initialized"))?;
 
         let key = client
             .store()

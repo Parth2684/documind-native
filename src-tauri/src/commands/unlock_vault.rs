@@ -44,13 +44,34 @@ pub async fn unlock_vault(password: String, app: AppHandle) -> Result<(), String
                 eprintln!("{}", error);
                 error
             })?;
+        let client = stronghold.load_client(b"documind").map_err(|err| {
+            eprintln!("Error getting stronghold client: {}", err);
+            String::from("Error getting stronghold client")
+        })?;
+
+        {
+            let mut client_state = state.client.lock().map_err(|err| {
+                let stmt = String::from("Error loading stronghold client in memory");
+                eprintln!("{}: {}", stmt, err);
+                stmt
+            })?;
+            *client_state = Some(client)
+        }
     } else {
         let db = state.db.clone();
 
-        stronghold.create_client(b"documind").map_err(|err| {
+        let client = stronghold.create_client(b"documind").map_err(|err| {
             eprintln!("error creating stronghold client: {}", err);
             String::from("Error creating stronghold client")
         })?;
+        {
+            let mut client_state = state.client.lock().map_err(|err| {
+                let stmt = String::from("Error loading stronghold client in memory");
+                eprintln!("{}: {}", stmt, err);
+                stmt
+            })?;
+            *client_state = Some(client)
+        }
         stronghold
             .commit_with_keyprovider(&snapshot, &key_provider)
             .map_err(|err| {

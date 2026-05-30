@@ -66,10 +66,15 @@ pub async fn insert_keys(app: AppHandle, name: String, key: String) -> Result<Ke
                     .as_mut()
                     .ok_or(String::from("Stronghold not initialized"))?;
 
-                let client = stronghold.load_client(b"documind").map_err(|err| {
-                    eprintln!("Error getting stronghold client: {}", err);
-                    String::from("Error getting stronghold client")
+                let mut client = state.client.lock().map_err(|err| {
+                    let stmt = String::from("Error getting lock on client");
+                    eprintln!("{}: {}", stmt, err);
+                    stmt
                 })?;
+        
+                let client = client
+                    .as_mut()
+                    .ok_or(String::from("Client not initialized"))?;
 
                 // let location = Location::generic("gemini_keys", hash.clone());
 
