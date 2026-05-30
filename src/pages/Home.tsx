@@ -6,7 +6,7 @@ import { Button } from '../components/ui/button';
 export default function Home() {
   const nav = useNavigate()
   return (
-    <div className="min-h-screen bg-linear-to-br from-background to-muted/20 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 flex items-center justify-center p-6">
       <div className="max-w-4xl w-full space-y-12">
         {/* Header */}
         <div className="text-center space-y-4">
@@ -19,7 +19,7 @@ export default function Home() {
         </div>
 
         {/* Feature Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
           {/* TTS Card */}
           <div className="group relative overflow-hidden rounded-xl border border-border bg-card p-6 shadow-sm transition-all hover:shadow-md hover:border-primary/50">
             <div className="space-y-4">
@@ -67,11 +67,12 @@ export default function Home() {
               </Button>
             </div>
           </div>
+          {/* Manage Keys Card */}
           <div className="group relative overflow-hidden rounded-xl border border-border bg-card p-6 shadow-sm transition-all hover:shadow-md hover:border-primary/50">
             <div className="space-y-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
                 <svg className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15.536a5 5 0 001.414 1.414m2.828-9.9a9 9 0 012.828-2.828" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11.536 14.536m-1.414-1.414L6.343 6.343m8.485 8.485L7.757 17.757M12 12V3m0 9v9m-9-9h9m0 0h9" />
                 </svg>
               </div>
               <div>
@@ -81,7 +82,7 @@ export default function Home() {
                 </p>
               </div>
               <Button
-                onClick={() => nav("/tts")}
+                onClick={() => nav("/edit-keys")}
                 className="w-full"
                 size="lg"
               >
@@ -89,11 +90,13 @@ export default function Home() {
               </Button>
             </div>
           </div>
+
+          {/* History Card */}
           <div className="group relative overflow-hidden rounded-xl border border-border bg-card p-6 shadow-sm transition-all hover:shadow-md hover:border-primary/50">
             <div className="space-y-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
                 <svg className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15.536a5 5 0 001.414 1.414m2.828-9.9a9 9 0 012.828-2.828" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
               <div>
@@ -103,7 +106,7 @@ export default function Home() {
                 </p>
               </div>
               <Button
-                onClick={() => nav("/tts")}
+                onClick={() => nav("/history")}
                 className="w-full"
                 size="lg"
               >

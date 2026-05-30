@@ -3,25 +3,35 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import { Button } from '../components/ui/button'
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast/headless';
+import { useNavigate } from 'react-router-dom';
 
 
 
 export default function Keys() {
   const { keys, setKeys, addKey, deleteKey } = store();
+  const nav = useNavigate();
   const [name, setName] = useState<string>()
   const [value, setValue] = useState<string>()
   useEffect(() => {
     setKeys()
   }, [])
   return (
-    <div className="min-h-screen bg-linear-to-br from-background to-muted/20 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 p-6">
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-foreground">API Keys</h1>
-          <p className="text-muted-foreground">
-            Manage your Gemini API keys for OCR and TTS features
-          </p>
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold text-foreground">API Keys</h1>
+            <p className="text-muted-foreground">
+              Manage your Gemini API keys for OCR and TTS features
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            onClick={() => nav("/home")}
+          >
+            Back to Home
+          </Button>
         </div>
 
         {/* Add Key Section */}

@@ -149,5 +149,6 @@ export const store = create<State & Action>((set, get) => ({
       console.error("error getting history: " + err);
       toast.error("Error getting history")
     }
+    set({ loading: false })
   }
 }));
