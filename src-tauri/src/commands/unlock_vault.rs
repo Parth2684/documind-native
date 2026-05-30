@@ -8,7 +8,7 @@ use crate::AppState;
 #[tauri::command]
 pub async fn unlock_vault(password: String, app: AppHandle) -> Result<(), String> {
     let state = app.state::<AppState>();
-    let local_data_dir = state.local_data_dir.clone();
+    let (local_data_dir, db) = { (state.local_data_dir.clone(), state.db.clone()) };
 
     let vault_path = local_data_dir.join("vault.hold");
 
@@ -22,7 +22,18 @@ pub async fn unlock_vault(password: String, app: AppHandle) -> Result<(), String
 
     let snapshot = SnapshotPath::from_path(&vault_path);
 
-    if vault_path.exists() {
+    let vault_exists = sqlx::query!(r#"
+        SELECT * from vault
+        WHERE id = 1
+    "#).fetch_optional(&db)
+    .await
+    .map_err(|err| {
+        let stmt = String::from("Error getting presense of vault");
+        eprintln!("{}: {}", stmt, err);
+        stmt
+    })?;
+
+    if let Some(_) = vault_exists {
         stronghold
             .load_snapshot(&key_provider, &snapshot)
             .map_err(|err| {
@@ -30,6 +41,7 @@ pub async fn unlock_vault(password: String, app: AppHandle) -> Result<(), String
                 eprintln!("{}", error);
                 error
             })?;
+
     } else {
         let db = state.db.clone();
 
