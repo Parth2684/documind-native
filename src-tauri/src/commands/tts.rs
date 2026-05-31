@@ -11,8 +11,7 @@ pub async fn tts(
     app: AppHandle,
     text: String,
     voice: String,
-    speed: f32,
-    text_id: Option<String>,
+    speed: f32
 ) -> Result<String, String> {
     let start = Instant::now();
 
@@ -46,6 +45,20 @@ pub async fn tts(
             })?;
     }
 
+    let id = Uuid::new_v4().to_string();
+    let ocr_id = sqlx::query!(r#"
+        INSERT INTO ocr_text (id, text)
+        VALUES ($1, $2)
+        ON CONFLICT (text) DO NOTHING
+        RETURNING id
+    "#, id, text)
+    .fetch_one(&db)
+    .await
+    .map_err(|err| {
+        let stmt = String::from("Error getting a text entry");
+        eprintln!("{}: {}", stmt, err);
+        stmt
+    })?;
     let elapsed = start.elapsed().as_secs_f32();
     let id = Uuid::new_v4().to_string();
     let wav_path = wav_path.to_string_lossy().to_string();
@@ -56,7 +69,7 @@ pub async fn tts(
     "#,
         id,
         wav_path,
-        text_id,
+        ocr_id.id,
         elapsed
     )
     .execute(&db)

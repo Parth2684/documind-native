@@ -15,19 +15,18 @@ export enum Category {
 }
 
 export interface History {
-  created_at: string;
   text: {
     id: string;
     text: string;
     created_at: string;
-  } | null,
+  },
   audio: {
     id: string;
     path: string;
     created_at: string;
     time: number;
-    ocr_id: string | null
-  } | null
+    ocr_id: string 
+    }[]
 }
 
 
@@ -76,7 +75,7 @@ export type State = {
   text: string;
   keys: Key[];
   loading: boolean;
-  history: History[]
+  history: Map<string, History>
 };
 
 export type Action = {

@@ -10,7 +10,7 @@ export const store = create<State & Action>((set, get) => ({
   text: "",
   keys: [],
   loading: false, 
-  history: [],
+  history: new Map(),
 
   
   setPasswordExistance: async () => {
@@ -133,16 +133,8 @@ export const store = create<State & Action>((set, get) => ({
   setHistory: async() => {
     set({ loading: true })
     try {
-      const history = await invoke<History[]>("history");
-      history.forEach((h) => {
-        h.created_at = new Date(h.created_at).toLocaleString();
-        if (h.audio?.created_at) {
-          h.audio.created_at = new Date(h.audio.created_at).toLocaleString()
-        }
-        if (h.text?.created_at) {
-          h.text.created_at = new Date(h.text.created_at).toLocaleString()
-        }
-      })
+      const history = await invoke<Map<string, History>>("history");
+      
       console.log(history)
       set({ history })
     } catch (err) {
@@ -160,8 +152,16 @@ export const store = create<State & Action>((set, get) => ({
         delete_from_fs
       })
 
-      let history = get().history
-      history.filter((h) => h.audio?.id === tts_id || h.text?.id === ocr_id);
+      let history = new Map(get().history)
+      
+      if (tts_id) {
+        history.forEach((h) => {
+          h.audio.filter(a => a.id === tts_id)
+        })
+      }
+      if (ocr_id) {
+        history.delete(ocr_id)
+      }
       set({ history })
     } catch (err) {
       console.error("error deleting record: " + err);

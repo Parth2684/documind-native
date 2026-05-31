@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        INSERT INTO ocr_text (id, text)\n        VALUES ($1, $2)\n        ON CONFLICT (text) DO NOTHING\n        RETURNING id\n    ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "363f1c27b5b4033385e0102d26b56246325e0c752a53f8582bddde2fe354b69c"
+}

@@ -345,6 +345,7 @@ pub async fn ocr(
         r#"
         INSERT INTO ocr_text (id, text)
         VALUES ($1, $2)
+        ON CONFLICT (text) DO NOTHING
     "#,
         id,
         ocr_clone
