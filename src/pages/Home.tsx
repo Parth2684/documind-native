@@ -6,8 +6,8 @@ import { Button } from '../components/ui/button';
 export default function Home() {
   const nav = useNavigate()
   return (
-    <div className="min-h-screen bg-linear-to-br from-background to-muted/20 flex items-center justify-center p-6">
-      <div className="max-w-4xl w-full space-y-12">
+    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 flex items-center justify-center p-6">
+      <div className="max-w-6xl w-full space-y-12">
         {/* Header */}
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold tracking-tight text-foreground">
@@ -19,7 +19,7 @@ export default function Home() {
         </div>
 
         {/* Feature Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
           {/* TTS Card */}
           <div className="group relative overflow-hidden rounded-xl border border-border bg-card p-6 shadow-sm transition-all hover:shadow-md hover:border-primary/50">
             <div className="space-y-4">
@@ -39,7 +39,7 @@ export default function Home() {
                 className="w-full"
                 size="lg"
               >
-                Get Started
+                Convert Text to Speech
               </Button>
             </div>
           </div>
@@ -63,7 +63,7 @@ export default function Home() {
                 className="w-full"
                 size="lg"
               >
-                Get Started
+                Extract Text from Files
               </Button>
             </div>
           </div>
@@ -86,7 +86,7 @@ export default function Home() {
                 className="w-full"
                 size="lg"
               >
-                Get Started
+                Manage API Keys
               </Button>
             </div>
           </div>
@@ -110,7 +110,7 @@ export default function Home() {
                 className="w-full"
                 size="lg"
               >
-                Get Started
+                View History
               </Button>
             </div>
           </div>

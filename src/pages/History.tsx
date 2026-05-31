@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { store } from '../store/useStore';
 import { Button } from '../components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +10,12 @@ import { History as HistoryType } from '../store/types';
 export default function History() {
   const { history, setHistory, deleteRecord, setText } = store()
   const nav = useNavigate()
-  
+  const [deleteDialog, setDeleteDialog] = useState<{
+    isOpen: boolean;
+    audioId: string | null;
+    audioPath: string | null;
+  }>({ isOpen: false, audioId: null, audioPath: null });
+
   useEffect(() => {
     setHistory()
   }, [])
@@ -42,37 +47,44 @@ export default function History() {
 
   const handleDelete = async (h: HistoryType) => {
     try {
-      // Delete the text record (which will cascade delete associated audio)
-      await deleteRecord(h.text.id, null, "true");
+      await deleteRecord(h.text.id, null, null);
       toast.success("Record deleted successfully");
-      await setHistory(); // Refresh the history list
+      await setHistory();
     } catch (err) {
       console.error("Error deleting record: " + err);
       toast.error("Error deleting record");
     }
   };
 
-  const handleDeleteAudio = async (audioId: string) => {
+  const handleDeleteAudio = async (audioId: string, audioPath: string, deleteFromFs: boolean) => {
     try {
-      await deleteRecord(null, audioId, "true");
+      await deleteRecord(null, audioId, deleteFromFs ? audioPath : null);
       toast.success("Audio deleted successfully");
-      await setHistory(); // Refresh the history list
+      await setHistory();
     } catch (err) {
       console.error("Error deleting audio: " + err);
       toast.error("Error deleting audio");
     }
   };
 
-  // Convert Map to array for rendering
+  const openDeleteDialog = (audioId: string, audioPath: string) => {
+    setDeleteDialog({ isOpen: true, audioId, audioPath });
+  };
+
+  const closeDeleteDialog = () => {
+    setDeleteDialog({ isOpen: false, audioId: null, audioPath: null });
+  };
+
   const historyArray = Object.entries(history) as [string, HistoryType][];
   console.log(history)
   console.log(historyArray)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 p-6">
-      <div className="max-w-4xl mx-auto space-y-8">
+      <div className="max-w-6xl mx-auto space-y-8">
+
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-2">
             <h1 className="text-3xl font-bold text-foreground">History</h1>
             <p className="text-muted-foreground">
@@ -82,6 +94,7 @@ export default function History() {
           <Button
             variant="outline"
             onClick={() => nav("/home")}
+            className="w-full sm:w-auto"
           >
             Back to Home
           </Button>
@@ -104,10 +117,12 @@ export default function History() {
             <div className="space-y-3">
               {historyArray.map((h) => {
                 const type = getHistoryType(h[1]);
-                
+
                 return (
                   <div key={h[1].text.id} className="rounded-xl border border-border bg-card p-4 shadow-sm space-y-4">
-                    <div className="flex items-start justify-between">
+
+                    {/* Header row */}
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                       <div className="flex items-center gap-2">
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
                           {type === 'ocr' && (
@@ -129,19 +144,27 @@ export default function History() {
                           <p className="text-xs text-muted-foreground">{formatDate(h[1].text.created_at)}</p>
                         </div>
                       </div>
-                      <Button onClick={() => {
-                        setText(h[1].text.text)
-                        nav("/tts")
-                          }}>Text To Speech</Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleDelete(h[1])}
-                      >
-                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </Button>
+                      <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                        <Button
+                          onClick={() => {
+                            setText(h[1].text.text)
+                            nav("/tts")
+                          }}
+                          className="w-full sm:w-auto"
+                        >
+                          Text To Speech
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDelete(h[1])}
+                          className="w-full sm:w-auto"
+                        >
+                          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </Button>
+                      </div>
                     </div>
 
                     {/* OCR Content - always present */}
@@ -169,12 +192,12 @@ export default function History() {
                           Audio Files ({h[1].audio.length})
                         </div>
                         {h[1].audio.map((audio) => (
-                          <div 
+                          <div
                             key={audio.id}
                             className="bg-muted/50 rounded-lg p-3 space-y-2"
                           >
-                            <div className="flex items-center justify-between">
-                              <div 
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                              <div
                                 onClick={async () => {
                                   try {
                                     await openPath(audio.path)
@@ -188,7 +211,7 @@ export default function History() {
                                   {audio.path}
                                 </p>
                               </div>
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-2 w-full sm:w-auto">
                                 {audio.time && (
                                   <div className="flex items-center gap-1 text-xs text-muted-foreground bg-background px-2 py-1 rounded">
                                     <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -200,7 +223,7 @@ export default function History() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() => handleDeleteAudio(audio.id)}
+                                  onClick={() => openDeleteDialog(audio.id, audio.path)}
                                   className="h-6 w-6 p-0"
                                 >
                                   <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -216,13 +239,59 @@ export default function History() {
                         ))}
                       </div>
                     )}
+
                   </div>
                 );
               })}
             </div>
           </div>
         )}
+
       </div>
+
+      {/* Delete Confirmation Dialog — outside the map, at root level */}
+      {deleteDialog.isOpen && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-card rounded-xl border border-border shadow-lg max-w-md w-full p-6 space-y-4">
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold text-foreground">Delete Audio File</h3>
+              <p className="text-sm text-muted-foreground">
+                Do you want to delete this audio file from the file system as well?
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 justify-end">
+              <Button
+                variant="outline"
+                onClick={closeDeleteDialog}
+                className="w-full sm:w-auto"
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  handleDeleteAudio(deleteDialog.audioId!, deleteDialog.audioPath!, false);
+                  closeDeleteDialog();
+                }}
+                className="w-full sm:w-auto"
+              >
+                Delete Record Only
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  handleDeleteAudio(deleteDialog.audioId!, deleteDialog.audioPath!, true);
+                  closeDeleteDialog();
+                }}
+                className="w-full sm:w-auto"
+              >
+                Delete File & Record
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
-  )
+  );
 }

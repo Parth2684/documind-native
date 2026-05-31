@@ -83,10 +83,10 @@ export default function Ocr() {
     )
   }
   return (
-    <div className="min-h-screen bg-linear-to-br from-background to-muted/20 p-6">
-      <div className="max-w-4xl mx-auto space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 p-6">
+      <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-2">
             <h1 className="text-3xl font-bold text-foreground">PDF & Image to Text</h1>
             <p className="text-muted-foreground">
@@ -96,6 +96,7 @@ export default function Ocr() {
           <Button
             variant="outline"
             onClick={() => nav("/home")}
+            className="w-full sm:w-auto"
           >
             Back to Home
           </Button>

@@ -62,6 +62,7 @@ export const store = create<State & Action>((set, get) => ({
       toast.success("TTS Successfull");
     } catch (err) {
       console.error(("Error doing tts: " + err))
+      toast.error("Error doing tts")
     }
     const end = performance.now();
     console.log(`Execution time: ${end - start} ms`);

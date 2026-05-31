@@ -49,7 +49,8 @@ pub async fn tts(
     let ocr_id = sqlx::query!(r#"
         INSERT INTO ocr_text (id, text)
         VALUES ($1, $2)
-        ON CONFLICT (text) DO NOTHING
+        ON CONFLICT (text) 
+        DO UPDATE SET text = excluded.text
         RETURNING id
     "#, id, text)
     .fetch_one(&db)

@@ -16,10 +16,10 @@ export default function Keys() {
     setKeys()
   }, [])
   return (
-    <div className="min-h-screen bg-linear-to-br from-background to-muted/20 p-6">
-      <div className="max-w-4xl mx-auto space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 p-6">
+      <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-2">
             <h1 className="text-3xl font-bold text-foreground">API Keys</h1>
             <p className="text-muted-foreground">
@@ -29,6 +29,7 @@ export default function Keys() {
           <Button
             variant="outline"
             onClick={() => nav("/home")}
+            className="w-full sm:w-auto"
           >
             Back to Home
           </Button>
@@ -37,7 +38,7 @@ export default function Keys() {
         {/* Add Key Section */}
         <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
           <div className="space-y-6">
-            <div className="flex items-start justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
                 <h2 className="text-lg font-semibold text-card-foreground">Add New Key</h2>
                 <p className="text-sm text-muted-foreground mt-1">
@@ -48,6 +49,7 @@ export default function Keys() {
                 variant="outline"
                 size="sm"
                 onClick={async() => await openUrl("https://ai.google.dev/gemini-api/docs/api-key")}
+                className="w-full sm:w-auto"
               >
                 Get API Key
               </Button>
@@ -86,7 +88,7 @@ export default function Keys() {
                 setName(undefined)
                 setValue(undefined)
               }}
-              className="w-full md:w-auto"
+              className="w-full sm:w-auto"
               size="lg"
             >
               Add Key
