@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Documind
+Comment=Gemini-based OCR and Kokoro-based TTS application
+Exec=documind
+Icon=documind
+Terminal=false
+Categories=Office;Utility;
+StartupNotify=true
