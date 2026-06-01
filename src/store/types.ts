@@ -3,15 +3,14 @@ export interface Key {
   name: string;
 }
 
-
 export enum Category {
-    Base = "Base",
-    Notes = "Notes",
-    Story = "Story",
-    Music = "Music",
-    Comic = "Comic",
-    Coding = "Coding",
-    Presentation = "Presentation",
+  Base = "Base",
+  Notes = "Notes",
+  Story = "Story",
+  Music = "Music",
+  Comic = "Comic",
+  Coding = "Coding",
+  Presentation = "Presentation",
 }
 
 export interface History {
@@ -19,25 +18,25 @@ export interface History {
     id: string;
     text: string;
     created_at: string;
-  },
+  };
   audio: {
     id: string;
     path: string;
     created_at: string;
     time: number;
-    ocr_id: string 
-    }[]
+    ocr_id: string;
+    voice: string;
+    speed: number
+    }[];
 }
-
 
 export enum Model {
   ThreeFiveFlash = "gemini-3.5-flash",
   ThreeFlashPreview = "gemini-3-flash-preview",
   ThreeOneFlashLite = "gemini-3.1-flash-lite",
   TwoFiveFlash = "gemini-2.5-flash",
-  TwoFiveFlashLite = "gemini-2.5-flash-lite" ,
+  TwoFiveFlashLite = "gemini-2.5-flash-lite",
 }
-
 
 export enum Voices {
   af_heart = "af_heart",
@@ -75,7 +74,7 @@ export type State = {
   text: string;
   keys: Key[];
   loading: boolean;
-  history: Map<string, History>
+  history: Map<string, History>;
 };
 
 export type Action = {
@@ -84,9 +83,18 @@ export type Action = {
   setText: (text: string) => void;
   tts: (voice: Voices, speed: number) => Promise<void>;
   setKeys: () => Promise<void>;
-  ocr: (hash: string, file_paths: Map<number, string>, category: Category, model: Model) => Promise<void>
-  addKey: (name: string, key: string) => Promise<void>
+  ocr: (
+    hash: string,
+    file_paths: Map<number, string>,
+    category: Category,
+    model: Model,
+  ) => Promise<void>;
+  addKey: (name: string, key: string) => Promise<void>;
   deleteKey: (hash: string) => Promise<void>;
-  setHistory: () => Promise<void>
-  deleteRecord: (ocr_id: string | null, tts_id: string | null, delete_from_fs: string | null) => Promise<void>
+  setHistory: () => Promise<void>;
+  deleteRecord: (
+    ocr_id: string | null,
+    tts_id: string | null,
+    delete_from_fs: string | null,
+  ) => Promise<void>;
 };

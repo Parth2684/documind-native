@@ -59,8 +59,8 @@ export default function History() {
   const handleDeleteAudio = async (audioId: string, audioPath: string, deleteFromFs: boolean) => {
     try {
       await deleteRecord(null, audioId, deleteFromFs ? audioPath : null);
-      toast.success("Audio deleted successfully");
-      await setHistory();
+      // toast.success("Audio deleted successfully");
+      // await setHistory();
     } catch (err) {
       console.error("Error deleting audio: " + err);
       toast.error("Error deleting audio");
@@ -75,7 +75,7 @@ export default function History() {
     setDeleteDialog({ isOpen: false, audioId: null, audioPath: null });
   };
 
-  const historyArray = Object.entries(history) as [string, HistoryType][];
+  const historyArray = Array.from(history);
   console.log(history)
   console.log(historyArray)
 
@@ -207,9 +207,10 @@ export default function History() {
                                 }}
                                 className="flex-1 cursor-pointer hover:bg-muted/30 rounded p-1 -m-1 transition-colors"
                               >
-                                <p className="text-xs text-muted-foreground font-mono break-all">
-                                  {audio.path}
+                                <p className="text-xs">
+                                  Voice: {audio.voice}, Speed: {audio.speed}x  
                                 </p>
+                                <p className='text-xs text-muted-foreground font-mono break-all'>Path: {audio.path}</p>
                               </div>
                               <div className="flex items-center gap-2 w-full sm:w-auto">
                                 {audio.time && (

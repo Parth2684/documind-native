@@ -20,6 +20,8 @@ pub struct Audio {
     created_at: NaiveDateTime,
     time: f64,
     ocr_id: String,
+    voice: String,
+    speed: f64,
 }
 
 #[derive(Serialize)]
@@ -49,7 +51,9 @@ pub async fn history(app: AppHandle) -> Result<HashMap<String, History>, String>
             t.created_at as tts_created_at,
             t.time,
             t.ocr_id,
-            t.path
+            t.path,
+            t.voice,
+            t.speed
 
         FROM ocr_text o
         LEFT JOIN tts t ON t.ocr_id = o.id
@@ -69,22 +73,52 @@ pub async fn history(app: AppHandle) -> Result<HashMap<String, History>, String>
     tts_ocr.into_iter().for_each(|h| {
         let exists = his.get(&h.id);
         if let Some(_) = exists {
-            if let (Some(tts_id), Some(path), Some(tts_created_at), Some(time), Some(ocr_id)) =
-                (h.tts_id, h.path, h.tts_created_at, h.time, h.ocr_id)
-            {
+            if let (
+                Some(tts_id),
+                Some(path),
+                Some(tts_created_at),
+                Some(time),
+                Some(ocr_id),
+                Some(voice),
+                Some(speed),
+            ) = (
+                h.tts_id,
+                h.path,
+                h.tts_created_at,
+                h.time,
+                h.ocr_id,
+                h.voice,
+                h.speed,
+            ) {
                 let entry = his.get_mut(&h.id).unwrap();
                 entry.audio.push(Audio {
                     id: tts_id,
                     path: path,
                     created_at: utc_to_local(&tts_created_at),
-                    time: time,
-                    ocr_id: ocr_id,
+                    time,
+                    ocr_id,
+                    voice,
+                    speed,
                 });
             }
         } else {
-            if let (Some(tts_id), Some(path), Some(tts_created_at), Some(time), Some(ocr_id)) =
-                (h.tts_id, h.path, h.tts_created_at, h.time, h.ocr_id)
-            {
+            if let (
+                Some(tts_id),
+                Some(path),
+                Some(tts_created_at),
+                Some(time),
+                Some(ocr_id),
+                Some(voice),
+                Some(speed),
+            ) = (
+                h.tts_id,
+                h.path,
+                h.tts_created_at,
+                h.time,
+                h.ocr_id,
+                h.voice,
+                h.speed,
+            ) {
                 his.insert(
                     h.id.clone(),
                     History {
@@ -95,10 +129,12 @@ pub async fn history(app: AppHandle) -> Result<HashMap<String, History>, String>
                         },
                         audio: vec![Audio {
                             id: tts_id,
-                            path: path,
+                            path,
                             created_at: utc_to_local(&tts_created_at),
-                            ocr_id: ocr_id,
-                            time: time,
+                            ocr_id,
+                            time,
+                            speed,
+                            voice,
                         }],
                     },
                 );

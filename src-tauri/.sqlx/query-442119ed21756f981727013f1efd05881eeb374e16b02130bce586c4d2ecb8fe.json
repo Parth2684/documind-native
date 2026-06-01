@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        INSERT INTO tts (id, path, ocr_id, time, voice, speed)\n        VALUES ($1, $2, $3, $4, $5, $6)\n    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 6
+    },
+    "nullable": []
+  },
+  "hash": "442119ed21756f981727013f1efd05881eeb374e16b02130bce586c4d2ecb8fe"
+}

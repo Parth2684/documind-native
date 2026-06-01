@@ -7,6 +7,7 @@
     "core:default",
     "opener:default",
     "dialog:default",
+    "fs:allow-remove",
     {
       "identifier": "opener:allow-open-path",
       "allow": [
@@ -14,6 +15,10 @@
           "path": "$HOME/Music/Documind/**"
         }
       ]
+    },
+    {
+      "identifier": "fs:scope",
+      "allow": [{ "path": "$MUSIC/Documind/**/*" }, { "path": "$APPCONFIG/**/*" }]
     }
   ]
 }

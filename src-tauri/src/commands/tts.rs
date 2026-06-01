@@ -11,7 +11,7 @@ pub async fn tts(
     app: AppHandle,
     text: String,
     voice: String,
-    speed: f32
+    speed: f32,
 ) -> Result<String, String> {
     let start = Instant::now();
 
@@ -28,12 +28,13 @@ pub async fn tts(
             }
             Ok(eng) => eng,
         };
+        let voice_clone = voice.clone();
         engine
             .synthesize_to_file(
                 &text,
                 wav_path,
                 Some(KokoroInferenceParams {
-                    voice,
+                    voice: voice_clone,
                     speed,
                     style_index: None,
                 }),
@@ -46,13 +47,17 @@ pub async fn tts(
     }
 
     let id = Uuid::new_v4().to_string();
-    let ocr_id = sqlx::query!(r#"
+    let ocr_id = sqlx::query!(
+        r#"
         INSERT INTO ocr_text (id, text)
         VALUES ($1, $2)
         ON CONFLICT (text) 
         DO UPDATE SET text = excluded.text
         RETURNING id
-    "#, id, text)
+    "#,
+        id,
+        text
+    )
     .fetch_one(&db)
     .await
     .map_err(|err| {
@@ -65,13 +70,15 @@ pub async fn tts(
     let wav_path = wav_path.to_string_lossy().to_string();
     sqlx::query!(
         r#"
-        INSERT INTO tts (id, path, ocr_id, time)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO tts (id, path, ocr_id, time, voice, speed)
+        VALUES ($1, $2, $3, $4, $5, $6)
     "#,
         id,
         wav_path,
         ocr_id.id,
-        elapsed
+        elapsed,
+        voice,
+        speed
     )
     .execute(&db)
     .await

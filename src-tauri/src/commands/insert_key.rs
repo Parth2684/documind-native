@@ -71,7 +71,7 @@ pub async fn insert_keys(app: AppHandle, name: String, key: String) -> Result<Ke
                     eprintln!("{}: {}", stmt, err);
                     stmt
                 })?;
-        
+
                 let client = client
                     .as_mut()
                     .ok_or(String::from("Client not initialized"))?;

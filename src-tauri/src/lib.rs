@@ -26,7 +26,7 @@ struct AppState {
     tts_dir: PathBuf,
     tts_engine: Mutex<KokoroEngine>,
     key_provider: Mutex<Option<KeyProvider>>,
-    client: Mutex<Option<Client>>
+    client: Mutex<Option<Client>>,
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -56,6 +56,7 @@ pub async fn run() {
     MIGRATOR.run(&pool).await.expect("Error Migrating Database");
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
@@ -130,7 +131,7 @@ pub async fn run() {
                 tts_dir,
                 tts_engine: Mutex::new(engine),
                 key_provider: Mutex::new(None),
-                client: Mutex::new(None)
+                client: Mutex::new(None),
             });
             Ok(())
         })

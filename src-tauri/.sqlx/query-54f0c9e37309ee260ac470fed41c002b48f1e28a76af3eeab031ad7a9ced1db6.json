@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            o.id,\n            o.text,\n            o.created_at,\n\n            t.id as tts_id,\n            t.created_at as tts_created_at,\n            t.time,\n            t.ocr_id,\n            t.path\n\n        FROM ocr_text o\n        LEFT JOIN tts t ON t.ocr_id = o.id\n        ORDER BY MAX(o.created_at, COALESCE(t.created_at, o.created_at)) DESC\n    ",
+  "query": "\n        SELECT\n            o.id,\n            o.text,\n            o.created_at,\n\n            t.id as tts_id,\n            t.created_at as tts_created_at,\n            t.time,\n            t.ocr_id,\n            t.path,\n            t.voice,\n            t.speed\n\n        FROM ocr_text o\n        LEFT JOIN tts t ON t.ocr_id = o.id\n        ORDER BY MAX(o.created_at, COALESCE(t.created_at, o.created_at)) DESC\n    ",
   "describe": {
     "columns": [
       {
@@ -42,6 +42,16 @@
         "name": "path",
         "ordinal": 7,
         "type_info": "Text"
+      },
+      {
+        "name": "voice",
+        "ordinal": 8,
+        "type_info": "Text"
+      },
+      {
+        "name": "speed",
+        "ordinal": 9,
+        "type_info": "Float"
       }
     ],
     "parameters": {
@@ -55,8 +65,10 @@
       true,
       true,
       true,
+      true,
+      true,
       true
     ]
   },
-  "hash": "bb20db6396cd8bff79b20e5fed0739d93b5992e1e186842ae9fb6deb0c30b64c"
+  "hash": "54f0c9e37309ee260ac470fed41c002b48f1e28a76af3eeab031ad7a9ced1db6"
 }

@@ -87,7 +87,6 @@ pub async fn ocr(
 ) -> Result<String, String> {
     let state = app.state::<AppState>();
     let key = {
-
         let mut client = state.client.lock().map_err(|err| {
             let stmt = String::from("Error getting lock on client");
             eprintln!("{}: {}", stmt, err);
