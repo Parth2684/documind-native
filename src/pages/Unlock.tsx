@@ -86,12 +86,16 @@ export default function Unlock() {
                     onChange={handleChange}
                     placeholder='0000'
                     maxLength={4}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          submit(password);
+                        }
+                      }}
                     className="flex h-11 w-full rounded-lg border border-input bg-background px-4 py-2 text-center text-2xl tracking-[0.5em] font-medium placeholder:text-muted-foreground/50 placeholder:tracking-normal focus:border-ring focus:ring-2 focus:ring-ring/20 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                   />
                 </div>
                 <Button
                   onClick={() => {
-                    console.log("click")
                     submit(password)
                   }}
                   className="w-full"
@@ -121,6 +125,11 @@ export default function Unlock() {
                     inputMode='numeric'
                     value={finalPassword}
                     onChange={finalHandleChange}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          setPasswordSubmit();
+                        }
+                      }}  
                     placeholder='0000'
                     maxLength={4}
                     className="flex h-11 w-full rounded-lg border border-input bg-background px-4 py-2 text-center text-2xl tracking-[0.5em] font-medium placeholder:text-muted-foreground/50 placeholder:tracking-normal focus:border-ring focus:ring-2 focus:ring-ring/20 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
