@@ -47,8 +47,8 @@ export const store = create<State & Action>((set, get) => ({
   },
 
   tts: async (voice: Voices, speed: number) => {
-    const start = performance.now();
     let text = get().text;
+    set({ loading: true })
     try {
       const path = await invoke<string>("tts", {
         text,
@@ -59,11 +59,14 @@ export const store = create<State & Action>((set, get) => ({
       console.log("tts saved at: " + path);
       toast.success("TTS Successfull");
     } catch (err) {
-      console.error("Error doing tts: " + err);
-      toast.error("Error doing tts");
+      if (typeof err == "string" && err.includes("Error making a audio file")) {
+        toast.error("espeak-ng might not be installed on your system")
+      } else {
+        console.error("Error doing tts: " + err);
+        toast.error("Error doing tts");
+      }
     }
-    const end = performance.now();
-    console.log(`Execution time: ${end - start} ms`);
+    set({ loading: false })    
   },
 
   setKeys: async () => {
@@ -110,6 +113,7 @@ export const store = create<State & Action>((set, get) => ({
       console.error("Error adding key: " + err);
       toast.error("Key Could'nt be added try again");
     }
+    set({loading: false})
   },
 
   deleteKey: async (hash) => {
@@ -124,6 +128,7 @@ export const store = create<State & Action>((set, get) => ({
       console.error("Error deleting key: " + err);
       toast.error("Error Deleteing key");
     }
+    set({ loading: false })
   },
 
   setHistory: async () => {
@@ -147,11 +152,6 @@ export const store = create<State & Action>((set, get) => ({
     delete_from_fs: string | null,
   ) => {
     try {
-      console.log({
-        ocr_id,
-        tts_id,
-        delete_from_fs,
-      });
       await invoke("delete_record", {
         ocrId: ocr_id,
         ttsId: tts_id,
@@ -160,17 +160,14 @@ export const store = create<State & Action>((set, get) => ({
 
 
       if (tts_id) {
-        console.log("history", get().history);
-        console.log("is array: ", Array.isArray(get().history));
-        console.log("is map: ", get().history instanceof Map);
-        console.log("before", Array.from(get().history));
+        
         let history = Array.from(get().history)
         history.forEach((his) => {
           his[1].audio = his[1].audio.filter((a) => a.id !== tts_id)
         });
         let historyMap = new Map(history);
         set({ history: historyMap })
-        console.log("after", historyMap);      }
+      }
       if (ocr_id) {
         let history = new Map(get().history);
         history.delete(ocr_id);

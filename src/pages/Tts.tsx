@@ -54,7 +54,7 @@ export default function Tts() {
                   setText(e.target.value)
                 }}
                 placeholder="Type or paste your text here..."
-                className="flex min-h-50 w-full rounded-lg border border-input bg-background px-4 py-3 text-sm placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+                className="flex min-h-[200px] lg:min-h-[300px] xl:min-h-[400px] w-full rounded-lg border border-input bg-background px-4 py-3 text-sm lg:text-base placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 resize-none"
               />
             </div>
           </div>

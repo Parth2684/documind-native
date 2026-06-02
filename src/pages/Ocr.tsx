@@ -9,7 +9,7 @@ import { Category, Model } from '../store/types';
 
 
 export default function Ocr() {
-  const { keys, setKeys, loading, ocr, text, setText } = store()
+  const { keys, setKeys, ocr, text, setText } = store()
   const nav = useNavigate();
   const [files, setFiles] = useState(new Map<number, string>())
   const [key, setKey] = useState<string>();
@@ -44,19 +44,19 @@ export default function Ocr() {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center space-y-4">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto"></div>
-          <p className="text-muted-foreground">Processing files...</p>
-        </div>
-      </div>
-    )
-  }
+  
   if (keys.length === 0) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-background to-muted/20 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-linear-to-br from-background to-muted/20 flex flex-col items-center justify-center p-6">
+        <div className="space-y-2">
+          <Button
+            variant="outline"
+            onClick={() => nav("/home")}
+            className="w-full sm:w-auto"
+          >
+            Back to Home
+          </Button>    
+        </div>
         <div className="max-w-md w-full">
           <div className="rounded-xl border border-border bg-card p-8 shadow-sm text-center space-y-6">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted mx-auto">
@@ -103,9 +103,9 @@ export default function Ocr() {
         </div>
 
         {/* Main Form */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:mt-17">
           {/* Left Column - File Selection & Configuration */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-5 space-y-6">
             {/* File Selection */}
             <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
               <div className="space-y-4">
@@ -231,14 +231,14 @@ export default function Ocr() {
           </div>
 
           {/* Right Column - Results */}
-          {text && (
-            <div className="space-y-6">
+         
+            <div className="lg:col-span-7 space-y-6">
               <div className="rounded-xl border border-border bg-card p-6 shadow-sm space-y-4">
                 <h2 className="text-lg font-semibold text-card-foreground">Extracted Text</h2>
                 <textarea
                   value={text}
                   onChange={(e) => setText(e.target.value)}
-                  className="flex min-h-75 w-full rounded-lg border border-input bg-background px-4 py-3 text-sm placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+                  className="flex lg:min-h-[570px] min-h-75 w-full rounded-lg border border-input bg-background px-4 py-3 text-sm placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 resize-none"
                   placeholder="Extracted text will appear here..."
                 />
                 <Button
@@ -250,7 +250,6 @@ export default function Ocr() {
                 </Button>
               </div>
             </div>
-          )}
         </div>
       </div>
     </div>
