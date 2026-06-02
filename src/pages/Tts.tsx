@@ -22,12 +22,19 @@ export default function Tts() {
             </p>
           </div>
           <Button
+            variant="secondary"
+            onClick={() => nav("/demo")}
+            className="w-full sm:w-auto"
+          >
+            Demo Audios
+          </Button>
+          <Button
             variant="outline"
             onClick={() => nav("/home")}
             className="w-full sm:w-auto"
           >
             Back to Home
-          </Button>
+          </Button>          
         </div>
 
         {/* Main Content */}

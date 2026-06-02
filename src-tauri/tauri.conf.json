@@ -19,8 +19,8 @@
       }
     ],
     "security": {
-      "csp": null
-    }
+          "csp": "default-src 'self'; media-src 'self' asset: https://asset.localhost;"
+        }
   },
   "bundle": {
     "linux":{
@@ -35,7 +35,7 @@
         "depends": ["espeak-ng"]
       }
     },
-    "resources": ["models/*"],
+    "resources": ["models/*", "voices/*"],
     "active": true,
     "targets": ["deb", "rpm"],
     "icon": [

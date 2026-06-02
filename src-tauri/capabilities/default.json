@@ -8,17 +8,24 @@
     "opener:default",
     "dialog:default",
     "fs:allow-remove",
+    "fs:read-dirs",
+    "fs:read-files",
     {
       "identifier": "opener:allow-open-path",
       "allow": [
         {
           "path": "$HOME/Music/Documind/**"
-        }
+        },
+        { "path": "$RESOURCE/**/*" }
       ]
     },
     {
       "identifier": "fs:scope",
-      "allow": [{ "path": "$MUSIC/Documind/**/*" }, { "path": "$APPCONFIG/**/*" }]
+      "allow": [
+        { "path": "$MUSIC/Documind/**/*" },
+        { "path": "$APPCONFIG/**/*" },
+        { "path": "$RESOURCE/**/*" }
+      ]
     }
   ]
 }

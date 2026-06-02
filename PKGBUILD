@@ -35,10 +35,7 @@ package() {
     "$pkgdir/usr/share/icons/hicolor/128x128/apps/documind.png"
 
   if [ -d "$srcdir/models" ]; then
-    echo "MODELS FOUND"
     install -d "$pkgdir/usr/lib/documind"
     cp -r "$srcdir/models" "$pkgdir/usr/lib/documind/"
-  else
-    echo "MODELS NOT FOUND"
   fi
 }

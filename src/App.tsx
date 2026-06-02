@@ -8,6 +8,7 @@ import Tts from './pages/Tts';
 import Ocr from './pages/Ocr';
 import Keys from './pages/Keys';
 import History from './pages/History';
+import Demo from './pages/Demo';
 
 function App() {
 
@@ -20,6 +21,7 @@ function App() {
         <Route path='/ocr' element={<Ocr />} />
         <Route path='/edit-keys' element={<Keys />} />
         <Route path='/history' element={<History />} />
+        <Route path='/demo' element={<Demo />} />
       </Routes>
       <Toaster />
     </>
