@@ -11,7 +11,9 @@ bun tauri build --no-bundle
 # Stage files
 cp src-tauri/target/release/documind package/
 cp documind.desktop package/
-cp src-tauri/icons/128x128.png package/documind.png
+cp src-tauri/icons/128x128.png package/128x128.png
+cp src-tauri/icons/32x32.png package/32x32.png
+cp src-tauri/icons/128x128@2x.png package/256x256@2.png
 
 # Copy models if they exist
 if [ -d "src-tauri/models" ]; then

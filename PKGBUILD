@@ -26,13 +26,19 @@ source_x86_64=(
 sha256sums_x86_64=('271f1d4bebe9808a8fc1e754681f2794265865367bb58dac7f2a4d2c4a871dd3')
 
 package() {
-  install -Dm755 "$srcdir/documind" "$pkgdir/usr/bin/documind"
+    install -Dm755 "$srcdir/documind" "$pkgdir/usr/bin/documind"
 
-  install -Dm644 "$srcdir/documind.desktop" \
+    install -Dm644 "$srcdir/documind.desktop" \
     "$pkgdir/usr/share/applications/documind.desktop"
 
-  install -Dm644 "$srcdir/documind.png" \
+    install -Dm644 "$srcdir/128x128.png" \
     "$pkgdir/usr/share/icons/hicolor/128x128/apps/documind.png"
+
+    install -Dm644 "$srcdir/32x32.png" \
+      "$pkgdir/usr/share/icons/hicolor/32x32/apps/documind.png"
+
+    install -Dm644 "$srcdir/256x256@2x.png" \
+        "$pkgdir/usr/share/icons/hicolor/256x256@2x/apps/documind.png"
 
   if [ -d "$srcdir/models" ]; then
     install -d "$pkgdir/usr/lib/documind"
