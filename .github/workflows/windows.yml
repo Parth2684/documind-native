@@ -28,7 +28,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Create resource directory
-        run: mkdir src-tauri\resources
+        run: mkdir src-tauri\models
         
       - name: Download Kokoro model
         run: |
