@@ -1,0 +1,53 @@
+name: macOS Build
+
+on:
+  push:
+    branches:
+      - macos
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    strategy:
+      matrix:
+        target:
+          - x86_64-apple-darwin
+          - aarch64-apple-darwin
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Cache Rust
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Create resource directory
+        run: mkdir -p src-tauri/models
+
+      - name: Download Kokoro model
+        run: |
+          curl -L "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.fp16-gpu.onnx" -o src-tauri/models/kokoro-v1.0.fp16-gpu.onnx
+          curl -L "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin" -o src-tauri/models/voices-v1.0.bin
+
+      - name: Build Tauri
+        run: bun run tauri build --target ${{ matrix.target }}
+
+      - name: Upload bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-${{ matrix.target }}
+          path: src-tauri/target/${{ matrix.target }}/release/bundle/
