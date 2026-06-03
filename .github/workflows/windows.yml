@@ -27,6 +27,14 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Create resource directory
+        run: mkdir src-tauri\resources
+        
+      - name: Download Kokoro model
+        run: |
+          curl -L "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.fp16-gpu.onnx" -o src-tauri\models\kokoro-v1.0.fp16-gpu.onnx
+          curl -L "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin" -o src-tauri\models\voices-v1.0.bin
+
       - name: Build Tauri
         run: bun run tauri build
 
