@@ -7,7 +7,7 @@ use sqlx::{
     sqlite::{SqliteConnectOptions, SqlitePoolOptions},
     Pool, Sqlite,
 };
-use tauri::{Manager, path::BaseDirectory};
+use tauri::{path::BaseDirectory, Manager};
 
 mod commands;
 
@@ -97,7 +97,9 @@ pub async fn run() {
                     }
                 }
             };
-            let resources_dir = app.path().resolve("", BaseDirectory::Resource)
+            let resources_dir = app
+                .path()
+                .resolve("", BaseDirectory::Resource)
                 .expect("Error Parsinf Resources Directory");
             println!("resource dir: {:?}", resources_dir);
             if !resources_dir.exists() {

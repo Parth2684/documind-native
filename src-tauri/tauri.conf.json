@@ -19,11 +19,26 @@
       }
     ],
     "security": {
-          "csp": "default-src 'self'; media-src 'self' asset: https://asset.localhost;"
-        }
+      "csp": "default-src 'self'; media-src 'self' asset: https://asset.localhost;"
+    }
   },
   "bundle": {
-    "linux":{
+    "windows": {
+      "allowDowngrades": true,
+      "certificateThumbprint": null,
+      "digestAlgorithm": null,
+      "minimumWebview2Version": null,
+      "nsis": null,
+      "signCommand": null,
+      "timestampUrl": null,
+      "tsp": false,
+      "webviewInstallMode": {
+        "silent": true,
+        "type": "downloadBootstrapper"
+      },
+      "wix": null
+    },
+    "linux": {
       "deb": {
         "files": {},
         "depends": ["espeak-ng"]
@@ -37,7 +52,7 @@
     },
     "resources": ["models/*", "voices/*"],
     "active": true,
-    "targets": ["deb", "rpm"],
+    "targets": ["nsis", "deb", "rpm"],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
