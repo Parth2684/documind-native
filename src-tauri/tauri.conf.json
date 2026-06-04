@@ -38,6 +38,25 @@
       },
       "wix": null
     },
+    "macOS": {
+      "dmg": {
+        "appPosition": {
+          "x": 180,
+          "y": 170
+        },
+        "applicationFolderPosition": {
+          "x": 480,
+          "y": 170
+        },
+        "windowSize": {
+          "height": 400,
+          "width": 660
+        }
+      },
+      "files": {},
+      "hardenedRuntime": true,
+      "minimumSystemVersion": "10.13"
+    },
     "linux": {
       "deb": {
         "files": {},
@@ -52,7 +71,7 @@
     },
     "resources": ["models/*", "voices/*"],
     "active": true,
-    "targets": ["nsis", "deb", "rpm"],
+    "targets": ["nsis", "deb", "rpm", "dmg", "app"],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
