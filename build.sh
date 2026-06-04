@@ -6,7 +6,7 @@ rm -rf package documind-linux-x86_64.tar.gz
 mkdir -p package
 
 # Build Tauri binary without bundling into .deb/.appimage
-bun tauri build --no-bundle
+bun tauri build 
 
 # Stage files
 cp src-tauri/target/release/documind package/

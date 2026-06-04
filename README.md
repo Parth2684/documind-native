@@ -140,12 +140,6 @@ Install Rust:
 
 https://rustup.rs
 
-### Node.js
-
-Install Node.js:
-
-https://nodejs.org
-
 ### Bun
 
 Install Bun:
@@ -209,6 +203,15 @@ choco install espeak
 
 Alternatively download the installer from the official eSpeak NG repository.
 
+### Install Poppler
+
+Documind uses `pdf2image` for PDF processing, which requires Poppler on Windows.
+
+#### Winget
+
+```powershell
+winget install -e --id oschwartz10612.Poppler
+```
 ---
 
 ## Downloading Kokoro Models
