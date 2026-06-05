@@ -207,10 +207,19 @@ Alternatively download the installer from the official eSpeak NG repository.
 
 Documind uses `pdf2image` for PDF processing, which requires Poppler on Windows.
 
+### Windows
 #### Winget
 
 ```powershell
 winget install -e --id oschwartz10612.Poppler
+```
+
+### macOS
+
+Using Homebrew:
+
+```bash
+brew install poppler
 ```
 ---
 
