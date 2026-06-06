@@ -59,3 +59,4 @@ sha2 = { version = "0.11.0", features = ["zeroize"] }
 tauri-plugin-dialog = "2"
 image = { version = "0.25.10", features = ["webp"] }
 tauri-plugin-fs = "2"
+fix-path-env = { git = "https://github.com/tauri-apps/fix-path-env-rs" }

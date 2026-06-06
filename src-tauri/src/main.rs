@@ -3,5 +3,6 @@
 
 #[tokio::main]
 async fn main() {
+    let _ = fix_path_env::fix();
     documind_lib::run().await
 }
